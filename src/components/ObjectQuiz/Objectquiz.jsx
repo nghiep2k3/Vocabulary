@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getDatabase, ref, child, get } from "firebase/database";
+import styles from "./objectquiz.module.css"
 import { database } from "../../firebase";
 import { Alert } from 'antd';
 
@@ -161,23 +162,27 @@ export default function Objectquiz() {
     }
 
     const { question } = shuffledQuizData[`c${currentQuestionIndex + 1}`];
-
+    //Câu hỏi số {currentQuestionIndex + 1}:
     return (
-        <div>
-            <div key={`question-${currentQuestionIndex}`}>
-                Câu hỏi số {currentQuestionIndex + 1}: {question}
-            </div>
-            {answers.map((answer, index) => (
-                <button key={index} onClick={() => checkAnswer(answer)}>
-                    {String.fromCharCode(65 + index)}. {answer}
-                </button>
-            ))}
-            {showMessage && <Alert message={message} type="success" />}
-            <div>
-                <button onClick={handleNextQuestion}>Tiếp theo</button>
-            </div>
-            <div>
-                <button onClick={AgainQuiz}>Làm lại</button>
+        <div className={styles.backgroundQuiz}>
+            <div style={{ width: '100%' }}>
+                <div key={`question-${currentQuestionIndex}`}>
+                    <p className={styles.quiz}>{question}</p>
+                </div>
+                <div className={styles.allQuiz}>
+                    {answers.map((answer, index) => (
+                        <div key={index} className={styles.answer} onClick={() => checkAnswer(answer)}>
+                            {String.fromCharCode(65 + index)}. {answer}
+                        </div>
+                    ))}
+                </div>
+                {showMessage && <Alert message={message} type="success" />}
+                <div>
+                    <button onClick={handleNextQuestion}>Tiếp theo</button>
+                </div>
+                <div>
+                    <button onClick={AgainQuiz}>Làm lại</button>
+                </div>
             </div>
         </div>
     );
