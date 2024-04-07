@@ -5,9 +5,20 @@ import Header from "./components/Header/Header";
 
 function App() {
   return (
-    <div style={{background: 'black'}}>
-      <Header/>
-      <Objectquiz></Objectquiz>
+    <div style={{ background: "black", height: "100vh" }}>
+      <Header />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "purple",
+          borderRadius: "20px",
+          height: "600px",
+        }}
+      >
+        <Objectquiz></Objectquiz>
+      </div>
     </div>
   );
 }

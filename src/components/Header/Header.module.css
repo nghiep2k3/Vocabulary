@@ -1,10 +1,37 @@
-.header{
+.header {
     background-color: black;
     text-align: center;
     height: 50px;
-    width: 100%;
     color: white;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    padding: 0 10px;
+}
+
+.banner {
+    font-size: 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    width: 300px;
+    text-align: center;
+    margin-left: -90px;
+}
+
+.addWord {
+    background-color: green;
+    color: white;
+    line-height: 30px;
+    width: 120px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    border-radius: 10px;
+    padding: 0 3px;
+}
+
+.setting{
+    
 }

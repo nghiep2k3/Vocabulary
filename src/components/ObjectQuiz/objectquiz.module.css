@@ -1,39 +1,66 @@
 .backgroundQuiz {
     background-color: rgb(91, 10, 91);
-    height: 100vh;
+    height: 600px;
     width: 100%;
     display: flex;
-    /* margin: 0 10px; */
     justify-content: center;
     border-radius: 20px;
     box-sizing: border-box;
-    /* align-items: center; */
+    position: relative;
+}
+
+.Go{
+    height: 60px;
+    border: 2px solid gray;
+    width: 120px;
+    cursor: pointer;
+    font-size: 18px;
+    color: white;
+    background-color: #00c985;
+    border-radius: 15px;
+    text-transform: uppercase;
+    font-weight: bold;
+
 }
 
 .quiz {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 30px;
+    text-align: center;
+    font-size: 50px;
+    font-weight: bold;
     color: white;
-    /* background-color: red; */
     height: 200px;
     width: 100%;
 }
 
-.allQuiz{
+.allQuiz {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 5px;
+    padding: 10px 4px;
+    margin-top: 70px;
+}
+
+.alertAnswer{
+    position: absolute;
+    top: 0;
+    width: 300px;
+    right: 0px;
+}
+
+.next {
+    position: absolute;
+
 }
 
 .answer {
     border-radius: 10px;
     background-color: #33CC33;
     height: 200px;
-    font-size: 22px;
-    font-weight: 500;
+    font-size: 25px;
+    font-weight: bold;
     color: white;
     width: 370px;
     display: inline-flex;
