@@ -2,6 +2,7 @@ import logo from "./logo.svg";
 import "./App.css";
 import Objectquiz from "./components/ObjectQuiz/Objectquiz";
 import Header from "./components/Header/Header";
+import "../src/"
 
 function App() {
   return (

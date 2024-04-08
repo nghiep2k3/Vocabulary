@@ -1,9 +1,31 @@
-*{
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-.ant-alert{
-  height: 60px !important; 
+.ant-alert {
+  height: 60px !important;
 }
+
+.ant-modal-title {
+  font-size: 25px !important;
+  text-transform: uppercase;
+}
+
+.ant-modal {
+  top: 130px !important;
+}
+
+.ant-modal-content {
+  height: 300px !important;
+}
+
+.ant-modal-body {
+  height: 170px !important;
+}
+
+.ant-input {
+  height: 45px;
+}
+

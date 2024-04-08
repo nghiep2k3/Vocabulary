@@ -67,3 +67,17 @@
     align-items: center;
     justify-content: space-around;
 }
+
+@media screen and (max-width: 767px) {
+    .answer{
+      width: 100%;
+      height: 100px;
+      margin-bottom: 20px;
+    }
+  
+    .allQuiz{
+      flex-direction: column;
+      height: 400px;
+      margin-top: 10px;
+    }
+  }

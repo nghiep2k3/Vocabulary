@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Header from "../Header/Header";
 import { getDatabase, ref, child, get } from "firebase/database";
 import 'animate.css';
 import styles from "./objectquiz.module.css";
@@ -31,7 +32,7 @@ export default function Objectquiz() {
                 if (snapshot.exists()) {
                     setData(snapshot.val());
                     setCount2(Object.keys(snapshot.val()).length);
-                    console.log("data", snapshot.val());
+                    console.log("data zzz", snapshot.val());
                     setLoad(false);
                 } else {
                     console.log("Không có dữ liệu");
@@ -147,7 +148,7 @@ export default function Objectquiz() {
     const checkAnswer = (selectedAnswer) => {
         if (selectedAnswer === correctAnswer) {
             setMessage("Chính xác!");
-            setTimeout(()=>{
+            setTimeout(() => {
                 handleNextQuestion();
             }, 1700)
         } else {
@@ -167,11 +168,16 @@ export default function Objectquiz() {
     };
 
     if (load || !data || Object.keys(data).length === 0) {
-        return <div style={{color: 'white', fontSize: '20px'}}>Đang tải...</div>;
+        return <div style={{ color: 'white', fontSize: '20px' }}>
+            Đang tải...
+        </div>;
     }
 
     if (!start) {
-        return <button onClick={ButtonStart} className={styles.Go}>Bắt đầu</button>;
+        return (<div>
+            <button onClick={ButtonStart} className={styles.Go}>
+                Bắt đầu</button>
+        </div>);
     }
 
     const { question } = shuffledQuizData[`c${currentQuestionIndex + 1}`];

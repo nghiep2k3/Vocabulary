@@ -11,11 +11,11 @@
 
 .banner {
     font-size: 20px;
+    font-family: cursive;
+    width: 300px;
     text-transform: uppercase;
     font-weight: bold;
-    width: 300px;
     text-align: center;
-    margin-left: -90px;
 }
 
 .addWord {
@@ -32,6 +32,26 @@
     padding: 0 3px;
 }
 
-.setting{
-    
+.ListWord {
+    background-color: green;
+    color: white;
+    line-height: 30px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    border-radius: 10px;
+    padding: 0 10px;
+}
+
+.setting {
+    width: 120px;
+}
+
+
+.label{
+    font-size: 16px;
+    margin-bottom: 5px;
+    display: block;
 }
