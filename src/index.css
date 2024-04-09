@@ -29,3 +29,11 @@
   height: 45px;
 }
 
+
+.ant-dropdown-trigger{
+  /* background-color: black !important; */
+}
+
+.ant-dropdown-open{
+  background-color: black !important;
+}

@@ -12,17 +12,16 @@
 .banner {
     font-size: 20px;
     font-family: cursive;
-    width: 300px;
+    /* width: 300px; */
     text-transform: uppercase;
     font-weight: bold;
     text-align: center;
 }
 
 .addWord {
-    background-color: green;
-    color: white;
+    color: black;
     line-height: 30px;
-    width: 120px;
+    width: 100%;
     cursor: pointer;
     font-size: 15px;
     font-weight: bold;
@@ -33,10 +32,10 @@
 }
 
 .ListWord {
-    background-color: green;
-    color: white;
+    color: black;
     line-height: 30px;
     cursor: pointer;
+    width: 100%;
     font-size: 15px;
     font-weight: bold;
     text-align: center;
@@ -46,7 +45,7 @@
 }
 
 .setting {
-    width: 120px;
+    /* width: 120px; */
 }
 
 
