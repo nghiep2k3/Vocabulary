@@ -1,13 +1,13 @@
-import logo from "./logo.svg";
-import "./App.css";
-import Objectquiz from "./components/ObjectQuiz/Objectquiz";
+import React from "react";
+import { Route,Routes, Outlet } from "react-router-dom";
 import Header from "./components/Header/Header";
-import "../src/"
+import Objectquiz from "./components/ObjectQuiz/Objectquiz";
+import Test from "./components/Test/Test";
 
 function App() {
   return (
     <div style={{ background: "black", height: "100vh" }}>
-      <Header />
+      <Header /> {/* Đảm bảo component Header được bao bọc bởi <Router> */}
       <div
         style={{
           display: "flex",
@@ -18,7 +18,7 @@ function App() {
           height: "600px",
         }}
       >
-        <Objectquiz></Objectquiz>
+        <Outlet/>
       </div>
     </div>
   );

@@ -5,8 +5,10 @@ import { Button, Modal, Input, message, Dropdown, Menu } from 'antd';
 import { child, get, ref, set } from 'firebase/database';
 import { database } from '../../firebase';
 import link from '../../assets/fakelove.mp3'
+import { Route, Routes, Link, Outlet, useNavigate } from "react-router-dom";
 
 export default function Header() {
+  const navigate = useNavigate();
   const dbRef = ref(database);
   const [open, setOpen] = useState(false);
   const [openSetting, setOpenSetting] = useState(false);
@@ -64,24 +66,37 @@ export default function Header() {
     setWord('');
     message.success('Thêm thành công', 1.5);
   };
+  const Start = () => {
+    navigate("/Test");
+  }
+  const ListWord = () => {
+    navigate("/ListWord");
+  }
+
+  const HomePage = () =>{
+    navigate("/Objectquiz")
+  }
 
   const menu = (
     <Menu>
       <Menu.Item key="1" onClick={showModal}>
         Thêm từ mới
       </Menu.Item>
-      <Menu.Item key="2" onClick={showModal}>
+      <Menu.Item key="2" onClick={ListWord}>
         Danh sách các từ
       </Menu.Item>
       <Menu.Item key="3" onClick={showModalSetting}>
         Cài đặt
+      </Menu.Item>
+      <Menu.Item key="4" onClick={Start}>
+        Bắt đầu
       </Menu.Item>
     </Menu>
   );
 
   return (
     <div className={styles.header}>
-      <div className={styles.banner}>Vocabulary</div>
+      <div className={styles.banner} onClick={HomePage}>Vocabulary</div>
       <div className={styles.setting}>
         <Dropdown overlay={menu} placement="bottomLeft" trigger={['click']}>
           <Button><UnorderedListOutlined /></Button>
@@ -122,7 +137,7 @@ export default function Header() {
         okText="Lưu"
         cancelText="Thoát"
       >
-        <audio controls src={link}></audio>
+        <audio style={{width: '100%'}} controls loop src={link}></audio>
       </Modal>
     </div>
   );

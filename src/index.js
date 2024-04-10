@@ -1,17 +1,41 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Objectquiz from "./components/ObjectQuiz/Objectquiz";
+import Test from "./components/Test/Test";
+import ListWord from "./components/ListWord/ListWord";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <App />
+    <Router>
+      <Routes>
+        <Route path="/" element={<App />}>
+          <Route index element={<Objectquiz />} />
+          <Route path="Objectquiz" element={<Objectquiz />} />
+          <Route path="Test" element={<Test />} />
+        </Route>
+
+        <Route path="/ListWord" element={<ListWord />} />
+      </Routes>
+    </Router>
   </React.StrictMode>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+/* dùng chung header 
+  <Route path="/"  element={<App />} >
+      <Route path="/Test"  element={<Test />} />
+  </Route>
+
+*/
+
+/*Không dùng chung header 
+  <Route path="/"  element={<App />} />
+  <Route path="/Test"  element={<Test />} />
+
+*/
 reportWebVitals();
