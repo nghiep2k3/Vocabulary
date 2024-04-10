@@ -1,5 +1,5 @@
 import React from "react";
-import { Route,Routes, Outlet } from "react-router-dom";
+import { Route, Routes, Outlet } from "react-router-dom";
 import Header from "./components/Header/Header";
 import Objectquiz from "./components/ObjectQuiz/Objectquiz";
 import Test from "./components/Test/Test";
@@ -18,7 +18,7 @@ function App() {
           height: "600px",
         }}
       >
-        <Outlet/>
+        <Outlet />
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import 'animate.css';
 import styles from "./objectquiz.module.css";
 import { database } from "../../firebase";
 import { Alert } from 'antd';
-
+import { CaretRightOutlined, UndoOutlined } from '@ant-design/icons';
 export default function Objectquiz() {
     const [data, setData] = useState({});
     const [load, setLoad] = useState(true);
@@ -17,6 +17,7 @@ export default function Objectquiz() {
     const [count2, setCount2] = useState(0);
     const [shuffledQuizData, setShuffledQuizData] = useState({});
     const [showMessage, setShowMessage] = useState(false);
+    const [showMessage2, setShowMessage2] = useState(false);
     const [message, setMessage] = useState("");
     const [animate, setAnimate] = useState('');
     const [answerColor, setAnswerColor] = useState('');
@@ -148,16 +149,19 @@ export default function Objectquiz() {
     const checkAnswer = (selectedAnswer) => {
         if (selectedAnswer === correctAnswer) {
             setMessage("Chính xác!");
+            setShowMessage(true);
             setTimeout(() => {
                 handleNextQuestion();
             }, 1700)
         } else {
             setMessage("Sai rồi. Hãy thử lại!");
+            setShowMessage2(true);
+
         }
-        setShowMessage(true);
 
         setTimeout(() => {
             setShowMessage(false);
+            setShowMessage2(false);
             setMessage("");
         }, 1700);
     };
@@ -201,15 +205,15 @@ export default function Objectquiz() {
                     ))}
                 </div>
                 <div className={styles.alertAnswer}>
-                    {showMessage && <Alert className="animate__animated animate__bounceOutUp animate__delay-1s" message={message} type="success" />}
+                    {showMessage && <Alert style={{backgroundColor: 'green', color: 'white', fontSize: '15px', border: 'none'}} className="animate__animated animate__bounceOutUp animate__delay-1s" message={message} type="success" />}
+                    {showMessage2 && <Alert style={{backgroundColor: 'red', color: 'white', fontSize: '15px', border: 'none'}} className="animate__animated animate__bounceOutUp animate__delay-1s" message={message} type="error" />}
                 </div>
+
                 <div className={styles.next}>
-                    <div>
-                        <button onClick={handleNextQuestion}>Tiếp theo</button>
-                    </div>
-                    <div>
-                        <button onClick={AgainQuiz}>Làm lại</button>
-                    </div>
+                    <button onClick={handleNextQuestion}><CaretRightOutlined style={{ fontSize: '25px', color: '#333' }} /></button>
+                </div>
+                <div className={styles.quit}>
+                    <button onClick={AgainQuiz}><UndoOutlined style={{ fontSize: '25px', color: '#333' }}/></button>
                 </div>
             </div>
         </div>

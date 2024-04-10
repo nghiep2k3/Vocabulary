@@ -52,7 +52,43 @@
 
 .next {
     position: absolute;
+    bottom: 20px;
+    right: 0;
+}
 
+.next > button{
+    height: 40px;
+    padding: 0 20px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    transition: background-color 0.5s;
+}
+
+.next:hover > button{
+    background-color: red;
+}
+
+.quit{
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+}
+
+.quit > button{
+    height: 40px;
+    padding: 0 20px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    transform: rotate(180deg);
+    transition: background-color 0.5s;
+}
+
+.next:hover > button{
+    background-color: yellow;
 }
 
 .answer {
@@ -79,5 +115,9 @@
       flex-direction: column;
       height: 400px;
       margin-top: 10px;
+    }
+
+    .next, .quit{
+        bottom: -45px;
     }
   }
