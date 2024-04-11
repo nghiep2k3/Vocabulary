@@ -2,12 +2,12 @@ import React from "react";
 import { Route, Routes, Outlet } from "react-router-dom";
 import Header from "./components/Header/Header";
 import Objectquiz from "./components/ObjectQuiz/Objectquiz";
-import Test from "./components/Test/Test";
+import Test from "./components/Lesson/Lesson";
 
 function App() {
   return (
     <div style={{ background: "black", height: "100vh" }}>
-      <Header /> {/* Đảm bảo component Header được bao bọc bởi <Router> */}
+      <Header /> 
       <div
         style={{
           display: "flex",

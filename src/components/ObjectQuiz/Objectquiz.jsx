@@ -6,7 +6,11 @@ import styles from "./objectquiz.module.css";
 import { database } from "../../firebase";
 import { Alert } from 'antd';
 import { CaretRightOutlined, UndoOutlined } from '@ant-design/icons';
+import { useParams } from 'react-router-dom';
+
+
 export default function Objectquiz() {
+    const { quiz } = useParams();
     const [data, setData] = useState({});
     const [load, setLoad] = useState(true);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -26,10 +30,13 @@ export default function Objectquiz() {
 
     const dbRef = ref(database);
 
+    
+
+    // console.log("props", props.quiz);
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const snapshot = await get(child(dbRef, `Vocabulary`));
+                const snapshot = await get(child(dbRef, `${quiz}/Vocabulary`));
                 if (snapshot.exists()) {
                     setData(snapshot.val());
                     setCount2(Object.keys(snapshot.val()).length);
@@ -45,6 +52,7 @@ export default function Objectquiz() {
 
         fetchData();
     }, []);
+
 
     useEffect(() => {
         if (!load && Object.keys(data).length > 0) {
@@ -205,15 +213,15 @@ export default function Objectquiz() {
                     ))}
                 </div>
                 <div className={styles.alertAnswer}>
-                    {showMessage && <Alert style={{backgroundColor: 'green', color: 'white', fontSize: '15px', border: 'none'}} className="animate__animated animate__bounceOutUp animate__delay-1s" message={message} type="success" />}
-                    {showMessage2 && <Alert style={{backgroundColor: 'red', color: 'white', fontSize: '15px', border: 'none'}} className="animate__animated animate__bounceOutUp animate__delay-1s" message={message} type="error" />}
+                    {showMessage && <Alert style={{ backgroundColor: 'green', color: 'white', fontSize: '15px', border: 'none' }} className="animate__animated animate__bounceOutUp animate__delay-1s" message={message} type="success" />}
+                    {showMessage2 && <Alert style={{ backgroundColor: 'red', color: 'white', fontSize: '15px', border: 'none' }} className="animate__animated animate__bounceOutUp animate__delay-1s" message={message} type="error" />}
                 </div>
 
                 <div className={styles.next}>
                     <button onClick={handleNextQuestion}><CaretRightOutlined style={{ fontSize: '25px', color: '#333' }} /></button>
                 </div>
                 <div className={styles.quit}>
-                    <button onClick={AgainQuiz}><UndoOutlined style={{ fontSize: '25px', color: '#333' }}/></button>
+                    <button onClick={AgainQuiz}><UndoOutlined style={{ fontSize: '25px', color: '#333' }} /></button>
                 </div>
             </div>
         </div>

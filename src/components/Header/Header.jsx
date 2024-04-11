@@ -67,7 +67,7 @@ export default function Header() {
         message.success('Thêm thành công', 1.5);
     };
     const Start = () => {
-        navigate("/Test");
+        navigate("/Lesson");
     }
     const ListWord = () => {
         navigate("/ListWord");
@@ -85,11 +85,11 @@ export default function Header() {
             <Menu.Item key="2" onClick={ListWord}>
                 Danh sách các từ
             </Menu.Item>
-            <Menu.Item key="3" onClick={showModalSetting}>
-                Cài đặt
+            <Menu.Item key="3" onClick={Start}>
+                Danh sách bài học
             </Menu.Item>
-            <Menu.Item key="4" onClick={Start}>
-                Bắt đầu
+            <Menu.Item key="4" onClick={showModalSetting}>
+                Cài đặt
             </Menu.Item>
         </Menu>
     );
