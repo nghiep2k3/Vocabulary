@@ -19,7 +19,7 @@ export default function ListWord() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const snapshot = await get(child(dbRef, `Vocabulary`));
+                const snapshot = await get(child(dbRef, `Bài 1/Vocabulary`));
                 if (snapshot.exists()) {
                     const vocabularyData = snapshot.val();
                     setData(Object.values(vocabularyData));
@@ -46,7 +46,7 @@ export default function ListWord() {
 
     const confirmDelete = async () => {
         try {
-            await remove(child(dbRef, `Vocabulary/c${idToDelete}`));
+            await remove(child(dbRef, `Bài 1/c${idToDelete}`));
             const updatedData = data.filter(item => item.id !== idToDelete);
             setData(updatedData);
             console.log(`Đã xóa từ vựng với id ${idToDelete}`);

@@ -185,6 +185,12 @@ export default function Objectquiz() {
         </div>;
     }
 
+    if(Object.keys(data).length <= 3){
+        return <div style={{ color: 'white', fontSize: '20px' }}>
+            Không thể tạo câu hỏi vì dưới 4 câu
+        </div>;
+    }
+
     if (!start) {
         return (<div>
             <button onClick={ButtonStart} className={styles.Go}>

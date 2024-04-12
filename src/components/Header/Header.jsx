@@ -12,8 +12,7 @@ export default function Header() {
     const dbRef = ref(database);
     const [open, setOpen] = useState(false);
     const [openSetting, setOpenSetting] = useState(false);
-    const [word, setWord] = useState('');
-    const [translate, setTranslate] = useState('');
+    const [titleLesson, setTitleLesson] = useState('');
     const [length, setLength] = useState(0);
 
     const showModal = () => {
@@ -48,22 +47,28 @@ export default function Header() {
         fetchData();
     }, []);
 
-    const handleAddWord = () => {
-        if (word === '' || translate === '') {
+    const handleAddWord = async () => {
+        if (titleLesson === '') {
             message.error('Thêm thất bại', 1.5);
             return;
         }
 
+        const snapshot = await get(dbRef);
+        const Length = Object.keys(snapshot.val()).length;
+
+
         const dataAdd = {
-            id: length + 1,
-            question: word,
-            answer: translate,
+            id: Length + 1,
+            question: "",
+            answer: "",
         };
 
-        set(ref(database, `Vocabulary/c${length + 1}`), dataAdd);
+        console.log(Length);
+        console.log(dataAdd);
+        const path = `${titleLesson}/Vocabulary/c1`;
+        set(ref(database, path), dataAdd);
         setLength(length + 1);
-        setTranslate('');
-        setWord('');
+        setTitleLesson('');
         message.success('Thêm thành công', 1.5);
     };
     const Start = () => {
@@ -80,15 +85,12 @@ export default function Header() {
     const menu = (
         <Menu>
             <Menu.Item key="1" onClick={showModal}>
-                Thêm từ mới
+                Thêm bài học
             </Menu.Item>
-            <Menu.Item key="2" onClick={ListWord}>
-                Danh sách các từ
-            </Menu.Item>
-            <Menu.Item key="3" onClick={Start}>
+            <Menu.Item key="2" onClick={Start}>
                 Danh sách bài học
             </Menu.Item>
-            <Menu.Item key="4" onClick={showModalSetting}>
+            <Menu.Item key="3" onClick={showModalSetting}>
                 Cài đặt
             </Menu.Item>
         </Menu>
@@ -103,7 +105,7 @@ export default function Header() {
                 </Dropdown>
             </div>
             <Modal
-                title="Thêm từ vựng"
+                title="Học là mãi mãi :)))"
                 open={open}
                 onOk={handleAddWord}
                 onCancel={hideModal}
@@ -111,22 +113,13 @@ export default function Header() {
                 cancelText="Thoát"
             >
                 <label htmlFor="Word" className={styles.label}>
-                    Từ tiếng Anh:
+                    Tên bài học:
                 </label>
                 <Input
                     id="Word"
-                    placeholder="Từ vựng"
-                    value={word}
-                    onChange={(e) => setWord(e.target.value)}
-                />
-                <label style={{ marginTop: '5px' }} htmlFor="Translate" className={styles.label}>
-                    Nghĩa tiếng Việt:
-                </label>
-                <Input
-                    id="Translate"
-                    placeholder="Nghĩa của từ"
-                    value={translate}
-                    onChange={(e) => setTranslate(e.target.value)}
+                    placeholder="Cuộc sống quá áp lực với chúng ta..."
+                    value={titleLesson}
+                    onChange={(e) => setTitleLesson(e.target.value)}
                 />
             </Modal>
             <Modal

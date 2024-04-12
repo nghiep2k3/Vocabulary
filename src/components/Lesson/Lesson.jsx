@@ -5,31 +5,51 @@ import { Button, Modal, Input, message } from 'antd';
 import { ref, get, set, child } from 'firebase/database';
 import { database } from '../../firebase';
 import Header from '../Header/Header';
+import { DatabaseOutlined } from '@ant-design/icons';
 
 export default function Lesson() {
     const navigate = useNavigate();
     const dbRef = ref(database);
     const [data, setData] = useState({});
     const [open, setOpen] = useState(false);
+    const [openWord, setOpenWord] = useState(false);
     const [word, setWord] = useState('');
     const [translate, setTranslate] = useState('');
     const [selectedItem, setSelectedItem] = useState('');
     const [load, setLoad] = useState(false);
+    const [vocabularyLengths, setVocabularyLengths] = useState({});
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const snapshot = await get(dbRef);
-                if (snapshot.exists()) {
-                    setData(snapshot.val());
-                    setLoad(true);
+        const fetchVocabularyLengths = async () => {
+            const dbRef = ref(database);
+            const snapshot = await get(dbRef); // Lấy snapshot của nút gốc
+            setData(snapshot.val());
+            setLoad(true);
+            if (snapshot.exists()) {
+                const vocabularyPaths = Object.keys(snapshot.val());
+
+                const lengths = {};
+
+                for (const path of vocabularyPaths) {
+                    const vocabularyRef = child(ref(database), `${path}/Vocabulary`);
+                    try {
+                        const vocabularySnapshot = await get(vocabularyRef);
+                        if (vocabularySnapshot.exists()) {
+                            lengths[path] = Object.keys(vocabularySnapshot.val()).length;
+                        } else {
+                            lengths[path] = 0;
+                        }
+                    } catch (error) {
+                        console.error(`Lỗi khi lấy độ dài của ${path}:`, error);
+                        lengths[path] = 0;
+                    }
                 }
-            } catch (error) {
-                console.error(error);
+
+                setVocabularyLengths(lengths); // Cập nhật state với các độ dài của các Vocabulary
             }
         };
 
-        fetchData();
+        fetchVocabularyLengths();
     }, []);
 
     const showModal = (item) => {
@@ -42,26 +62,33 @@ export default function Lesson() {
         window.location.reload();
     };
 
+    const showModalWord = async (item) => {
+        setSelectedItem(item);
+        const snapshot = await get(child(dbRef, `${item}/Vocabulary`));
+        console.log("data modal:",snapshot.val());
+        setOpenWord(true);
+    };
+
+    const hideModalWord = () => {
+        setOpenWord(false);
+    };
+
     const handleAddWord = async () => {
         const snapshot = await get(child(dbRef, `${selectedItem}/Vocabulary`));
-        const Length = Object.keys(snapshot.val()).length;
+        const length = Object.keys(snapshot.val()).length;
 
         if (word === '' || translate === '') {
             message.error('Thêm thất bại', 1.5);
             return;
         }
 
-
-
         const dataAdd = {
-            id: Length + 1,
+            id: length + 1,
             question: word,
             answer: translate,
         };
 
-        console.log(Length);
-        console.log('selectedItem', selectedItem);
-        const path = `${selectedItem}/Vocabulary/c${Length + 1}`;
+        const path = `${selectedItem}/Vocabulary/c${length + 1}`;
         set(ref(database, path), dataAdd);
         setTranslate('');
         setWord('');
@@ -80,13 +107,16 @@ export default function Lesson() {
                 {Object.keys(data).map((item, index) => (
                     <div key={item} className={styles.Lesson}>
                         <Link to={`/Objectquiz/${item}`}>
-                            <Button style={{ width: '200px' }}>{item}</Button>
+                            <Button disabled={vocabularyLengths[item] < 3} style={{ width: '200px' }}>
+                                {item}
+                            </Button>
                         </Link>
-
                         <Button onClick={() => showModal(item)}>+</Button> {/* Gọi showModal với tham số `item` */}
+                        <Button onClick={() => showModalWord(item)}><DatabaseOutlined /></Button> {/* Gọi showModal với tham số `item` */}
                     </div>
                 ))}
             </div>
+            {/* Modal Thêm từ */}
             <Modal
                 title="Thêm từ vựng"
                 open={open}
@@ -113,6 +143,18 @@ export default function Lesson() {
                     value={translate}
                     onChange={(e) => setTranslate(e.target.value)}
                 />
+            </Modal>
+
+            {/* Modal Danh sách từ */}
+            <Modal
+                title="Danh sách từ"
+                open={openWord}
+                // onOk={handleAddWord}
+                onCancel={hideModalWord}
+                okText="Thêm"
+                cancelText="Thoát"
+            >
+                
             </Modal>
         </div>
     );

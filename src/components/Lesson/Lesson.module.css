@@ -19,3 +19,9 @@
     margin-bottom: 5px;
     display: block;
 }
+
+.AddLesson{
+    position: absolute;
+    top: 0;
+    right: 0;
+}
