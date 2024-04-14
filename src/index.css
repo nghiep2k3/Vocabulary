@@ -17,13 +17,34 @@
   top: 130px !important;
 }
 
-.ant-modal-content {
-  height: 300px !important;
+/* .ant-modal-content {
+  overflow: overlay;
+  height: 360px !important;
+} */
+
+.custom-modal-1 .ant-modal-content {
+  height: 230px !important;
+  overflow: overlay;
 }
 
-.ant-modal-body {
-  height: 170px !important;
+.custom-modal-1 .ant-modal-body {
+  height: 100px !important;
 }
+
+.custom-modal-2 .ant-modal-content {
+  height: 360px !important;
+  overflow: overlay;
+}
+
+/* .custom-modal-2 .ant-modal-body {
+  height: 100px !important;
+} */
+
+/* .ant-modal-body {
+  height: 240px !important;
+} */
+
+
 
 .ant-input {
   height: 45px;

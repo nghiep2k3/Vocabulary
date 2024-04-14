@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import Header from "../Header/Header";
-import { getDatabase, ref, child, get } from "firebase/database";
-import 'animate.css';
-import styles from "./objectquiz.module.css";
-import { database } from "../../firebase";
+import React, { useEffect, useState, useRef } from "react";
+import { useParams } from 'react-router-dom';
 import { Alert } from 'antd';
 import { CaretRightOutlined, UndoOutlined } from '@ant-design/icons';
-import { useParams } from 'react-router-dom';
-
+import { database } from "../../firebase";
+import 'animate.css';
+import styles from "./objectquiz.module.css";
+import link from '../../assets/fakelove.mp3';
+import link2 from '../../assets/Lanterns.mp3';
+import { child, get, ref } from "firebase/database";
 
 export default function Objectquiz() {
     const { quiz } = useParams();
@@ -25,14 +25,13 @@ export default function Objectquiz() {
     const [message, setMessage] = useState("");
     const [animate, setAnimate] = useState('');
     const [answerColor, setAnswerColor] = useState('');
+    const [linkSrc, setLinkSrc] = useState([link, link2]);
     const colors = ['#00DD00', 'orange', '#FF3300', 'black', '#FF99CC', '#996600', '#708090', '#8B8989', 'black', '#FF99CC', '#00DD00', 'orange', '#708090', 'orange', '#FF3300', 'black'];
     const [colorIndex, setColorIndex] = useState(0);
+    const audioRef = useRef(null); // Tham chiếu tới phần tử audio
 
     const dbRef = ref(database);
 
-    
-
-    // console.log("props", props.quiz);
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -40,7 +39,6 @@ export default function Objectquiz() {
                 if (snapshot.exists()) {
                     setData(snapshot.val());
                     setCount2(Object.keys(snapshot.val()).length);
-                    console.log("data zzz", snapshot.val());
                     setLoad(false);
                 } else {
                     console.log("Không có dữ liệu");
@@ -52,7 +50,6 @@ export default function Objectquiz() {
 
         fetchData();
     }, []);
-
 
     useEffect(() => {
         if (!load && Object.keys(data).length > 0) {
@@ -95,7 +92,7 @@ export default function Objectquiz() {
     };
 
     const handleNextQuestion = () => {
-        setAnimate('animate__animated animate__backOutDown'); // Thực hiện hiệu ứng khi chuyển câu hỏi
+        setAnimate('animate__animated animate__backOutDown');
 
         if (!start) {
             setStart(true);
@@ -106,6 +103,7 @@ export default function Objectquiz() {
             setCount1(1);
             setCurrentQuestionIndex(0);
             setStart(false);
+
             const questionKeys = Object.keys(data);
             const shuffledQuestionKeys = shuffleArray(questionKeys);
 
@@ -120,11 +118,10 @@ export default function Objectquiz() {
             return;
         }
 
-        // Sau khi thực hiện hiệu ứng, thực hiện chuyển câu hỏi tiếp theo và hiệu ứng mới
         setTimeout(() => {
             setQuestionAndAnswers(shuffledQuizData, currentQuestionIndex + 1);
             setCount1(count1 + 1);
-            setAnimate('animate__animated animate__bounceInDown'); // Hiệu ứng khi hiển thị câu hỏi mới
+            setAnimate('animate__animated animate__bounceInDown');
             setColorIndex(colorIndex + answers.length);
         }, 1000);
     };
@@ -136,12 +133,23 @@ export default function Objectquiz() {
         setTimeout(() => setAnimate(''), 1000);
     };
 
+    const playAudio = () => {
+        const audioElement = audioRef.current;
+        if (audioElement) {
+            audioElement.play().catch(error => {
+                console.error('Error playing audio:', error);
+            });
+        }
+    };
+
+
     const AgainQuiz = () => {
         setAnimate('');
         setColorIndex(0);
         setCount1(1);
         setCurrentQuestionIndex(0);
         setStart(false);
+
         const questionKeys = Object.keys(data);
         const shuffledQuestionKeys = shuffleArray(questionKeys);
 
@@ -164,7 +172,6 @@ export default function Objectquiz() {
         } else {
             setMessage("Sai rồi. Hãy thử lại!");
             setShowMessage2(true);
-
         }
 
         setTimeout(() => {
@@ -179,29 +186,28 @@ export default function Objectquiz() {
         return colors[index];
     };
 
-    if (load || !data || Object.keys(data).length === 0) {
-        return <div style={{ color: 'white', fontSize: '20px' }}>
-            Đang tải...
-        </div>;
-    }
 
-    if(Object.keys(data).length <= 3){
-        return <div style={{ color: 'white', fontSize: '20px' }}>
-            Không thể tạo câu hỏi vì dưới 4 câu
-        </div>;
+    if (load || !data || Object.keys(data).length === 0) {
+        return <div style={{ color: 'white', fontSize: '20px' }}>Đang tải...</div>;
     }
 
     if (!start) {
-        return (<div>
-            <button onClick={ButtonStart} className={styles.Go}>
-                Bắt đầu</button>
-        </div>);
+        return (
+            <div>
+                <button onClick={ButtonStart} className={styles.Go}>Bắt đầu</button>
+            </div>
+        );
     }
 
     const { question } = shuffledQuizData[`c${currentQuestionIndex + 1}`];
 
     return (
         <div className={styles.backgroundQuiz}>
+            { playAudio()}
+            <div style={{display: 'none'}}>
+                <audio src={linkSrc[0]} ref={audioRef} controls>
+                </audio>
+            </div>
             <div style={{ width: '100%' }}>
                 <div key={`question-${currentQuestionIndex}`}>
                     <p className={`${styles.quiz} ${animate}`}>{question}</p>
@@ -219,15 +225,32 @@ export default function Objectquiz() {
                     ))}
                 </div>
                 <div className={styles.alertAnswer}>
-                    {showMessage && <Alert style={{ backgroundColor: 'green', color: 'white', fontSize: '15px', border: 'none' }} className="animate__animated animate__bounceOutUp animate__delay-1s" message={message} type="success" />}
-                    {showMessage2 && <Alert style={{ backgroundColor: 'red', color: 'white', fontSize: '15px', border: 'none' }} className="animate__animated animate__bounceOutUp animate__delay-1s" message={message} type="error" />}
+                    {showMessage && (
+                        <Alert
+                            style={{ backgroundColor: 'green', color: 'white', fontSize: '15px', border: 'none' }}
+                            className="animate__animated animate__bounceOutUp animate__delay-1s"
+                            message={message}
+                            type="success"
+                        />
+                    )}
+                    {showMessage2 && (
+                        <Alert
+                            style={{ backgroundColor: 'red', color: 'white', fontSize: '15px', border: 'none' }}
+                            className="animate__animated animate__bounceOutUp animate__delay-1s"
+                            message={message}
+                            type="error"
+                        />
+                    )}
                 </div>
-
                 <div className={styles.next}>
-                    <button onClick={handleNextQuestion}><CaretRightOutlined style={{ fontSize: '25px', color: '#333' }} /></button>
+                    <button onClick={handleNextQuestion}>
+                        <CaretRightOutlined style={{ fontSize: '25px', color: '#333' }} />
+                    </button>
                 </div>
                 <div className={styles.quit}>
-                    <button onClick={AgainQuiz}><UndoOutlined style={{ fontSize: '25px', color: '#333' }} /></button>
+                    <button onClick={AgainQuiz}>
+                        <UndoOutlined style={{ fontSize: '25px', color: '#333' }} />
+                    </button>
                 </div>
             </div>
         </div>

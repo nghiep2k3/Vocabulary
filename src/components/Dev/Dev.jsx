@@ -1,55 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import { ref, child, get } from 'firebase/database';
-import { database } from '../../firebase';
+import React, { useRef } from 'react';
+import link from '../../assets/fakelove.mp3'
 
-const Dev = () => {
-    const [vocabularyLengths, setVocabularyLengths] = useState({});
+const App = () => {
+  const audioRef = useRef(null);
 
-    useEffect(() => {
-        const fetchVocabularyLengths = async () => {
-            const dbRef = ref(database);
-            const snapshot = await get(dbRef); // Lấy snapshot của nút gốc
-            
-            if (snapshot.exists()) {
-                const vocabularyPaths = Object.keys(snapshot.val());
-                
-                const lengths = {};
+  const playAudio = () => {
+    const audioElement = audioRef.current;
+    if (audioElement) {
+      audioElement.play(); // Phát âm thanh nếu audioElement tồn tại
+    }
+  };
 
-                for (const path of vocabularyPaths) {
-                    const vocabularyRef = child(ref(database), `${path}/Vocabulary`);
-                    console.log(1111, `${path}/Vocabulary`);
-                    try {
-                        const vocabularySnapshot = await get(vocabularyRef);
-                        if (vocabularySnapshot.exists()) {
-                            lengths[path] = Object.keys(vocabularySnapshot.val()).length
-                        } else {
-                            lengths[path] = 0;
-                        }
-                    } catch (error) {
-                        console.error(`Lỗi khi lấy độ dài của ${path}:`, error);
-                        lengths[path] = 0;
-                    }
-                }
-
-                setVocabularyLengths(lengths); // Cập nhật state với các độ dài của các Vocabulary
-            }
-        };
-
-        fetchVocabularyLengths();
-    }, []);
-
-    return (
-        <div>
-            <h2>Chiều dài của từng Vocabulary:</h2>
-            <ul>
-                {Object.keys(vocabularyLengths).map((vocabularyName) => (
-                    <li key={vocabularyName}>
-                        {vocabularyName}: {vocabularyLengths[vocabularyName]}
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
+  return (
+    <div>
+      <h1>Phát Nhạc Khi Ấn Nút</h1>
+      <button onClick={playAudio}>Phát Nhạc</button>
+      <audio ref={(element) => (audioRef.current = element)}>
+        <source src={link} type="audio/mp3" />
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+  );
 };
 
-export default Dev;
+export default App;

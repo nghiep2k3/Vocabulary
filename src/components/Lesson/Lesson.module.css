@@ -25,3 +25,15 @@
     top: 0;
     right: 0;
 }
+.ListWordModal{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.Layout{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}

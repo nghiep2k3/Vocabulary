@@ -4,7 +4,8 @@ import { SettingOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { Button, Modal, Input, message, Dropdown, Menu } from 'antd';
 import { child, get, ref, set } from 'firebase/database';
 import { database } from '../../firebase';
-import link from '../../assets/fakelove.mp3'
+import link from '../../assets/fakelove.mp3';
+import link2 from '../../assets/Lanterns.mp3';
 import { Route, Routes, Link, Outlet, useNavigate } from "react-router-dom";
 
 export default function Header() {
@@ -14,6 +15,10 @@ export default function Header() {
     const [openSetting, setOpenSetting] = useState(false);
     const [titleLesson, setTitleLesson] = useState('');
     const [length, setLength] = useState(0);
+    const [linkSrc, setLinkSrc] = useState([
+        { id: 1, name: "Fake Love", src: link },
+        { id: 2, name: "Lanterns", src: link2 }
+    ]);
 
     const showModal = () => {
         setOpen(true);
@@ -56,31 +61,30 @@ export default function Header() {
         const snapshot = await get(dbRef);
         const Length = Object.keys(snapshot.val()).length;
 
-
         const dataAdd = {
             id: Length + 1,
             question: "",
             answer: "",
         };
 
-        console.log(Length);
-        console.log(dataAdd);
         const path = `${titleLesson}/Vocabulary/c1`;
         set(ref(database, path), dataAdd);
         setLength(length + 1);
         setTitleLesson('');
         message.success('Thêm thành công', 1.5);
     };
+
     const Start = () => {
         navigate("/Lesson");
-    }
+    };
+
     const ListWord = () => {
         navigate("/ListWord");
-    }
+    };
 
     const HomePage = () => {
-        navigate("/Objectquiz")
-    }
+        navigate("/Objectquiz");
+    };
 
     const menu = (
         <Menu>
@@ -105,6 +109,7 @@ export default function Header() {
                 </Dropdown>
             </div>
             <Modal
+               className="custom-modal-1"
                 title="Học là mãi mãi :)))"
                 open={open}
                 onOk={handleAddWord}
@@ -130,7 +135,12 @@ export default function Header() {
                 okText="Lưu"
                 cancelText="Thoát"
             >
-                <audio style={{ width: '100%' }} controls loop src={link}></audio>
+                {linkSrc.map((item) => (
+                    <div key={item.id}>
+                        <b>Name: {item.name}</b>
+                        <audio style={{ width: '100%' }} controls loop src={item.src}></audio>
+                    </div>
+                ))}
             </Modal>
         </div>
     );

@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Lesson.module.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button, Modal, Input, message } from 'antd';
-import { ref, get, set, child } from 'firebase/database';
+import { ref, get, child, set, remove } from 'firebase/database';
 import { database } from '../../firebase';
 import Header from '../Header/Header';
 import { DatabaseOutlined } from '@ant-design/icons';
 
 export default function Lesson() {
-    const navigate = useNavigate();
     const dbRef = ref(database);
     const [data, setData] = useState({});
+    const [dataModal, setDataModal] = useState([]);
     const [open, setOpen] = useState(false);
     const [openWord, setOpenWord] = useState(false);
     const [word, setWord] = useState('');
@@ -18,34 +18,39 @@ export default function Lesson() {
     const [selectedItem, setSelectedItem] = useState('');
     const [load, setLoad] = useState(false);
     const [vocabularyLengths, setVocabularyLengths] = useState({});
+    const [searchTerm, setSearchTerm] = useState('');
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [idToDelete, setIdToDelete] = useState(null);
 
     useEffect(() => {
         const fetchVocabularyLengths = async () => {
-            const dbRef = ref(database);
-            const snapshot = await get(dbRef); // Lấy snapshot của nút gốc
-            setData(snapshot.val());
-            setLoad(true);
+            const snapshot = await get(dbRef);
+
             if (snapshot.exists()) {
-                const vocabularyPaths = Object.keys(snapshot.val());
+                const dataValue = snapshot.val();
+                setData(dataValue);
+                setLoad(true);
 
                 const lengths = {};
 
-                for (const path of vocabularyPaths) {
-                    const vocabularyRef = child(ref(database), `${path}/Vocabulary`);
+                for (const key of Object.keys(dataValue)) {
+                    const vocabularyRef = child(ref(database), `${key}/Vocabulary`);
+
                     try {
-                        const vocabularySnapshot = await get(vocabularyRef);
-                        if (vocabularySnapshot.exists()) {
-                            lengths[path] = Object.keys(vocabularySnapshot.val()).length;
+                        const vocabSnapshot = await get(vocabularyRef);
+
+                        if (vocabSnapshot.exists()) {
+                            lengths[key] = Object.keys(vocabSnapshot.val()).length;
                         } else {
-                            lengths[path] = 0;
+                            lengths[key] = 0;
                         }
                     } catch (error) {
-                        console.error(`Lỗi khi lấy độ dài của ${path}:`, error);
-                        lengths[path] = 0;
+                        console.error(`Lỗi khi lấy độ dài của từ vựng cho ${key}:`, error);
+                        lengths[key] = 0;
                     }
                 }
 
-                setVocabularyLengths(lengths); // Cập nhật state với các độ dài của các Vocabulary
+                setVocabularyLengths(lengths);
             }
         };
 
@@ -53,46 +58,97 @@ export default function Lesson() {
     }, []);
 
     const showModal = (item) => {
-        setSelectedItem(item); // Lưu trữ `item` được chọn vào state
+        setSelectedItem(item);
         setOpen(true);
     };
 
     const hideModal = () => {
         setOpen(false);
-        window.location.reload();
+        window.location.reload(); // Tải lại trang sau khi đóng modal
     };
 
     const showModalWord = async (item) => {
         setSelectedItem(item);
-        const snapshot = await get(child(dbRef, `${item}/Vocabulary`));
-        console.log("data modal:",snapshot.val());
-        setOpenWord(true);
+        const vocabularyRef = child(dbRef, `${item}/Vocabulary`);
+
+        try {
+            const vocabSnapshot = await get(vocabularyRef);
+
+            if (vocabSnapshot.exists()) {
+                const vocabData = vocabSnapshot.val();
+                setDataModal(Object.values(vocabData));
+                setOpenWord(true);
+            }
+        } catch (error) {
+            console.error(`Lỗi khi lấy danh sách từ vựng cho ${item}:`, error);
+        }
     };
 
     const hideModalWord = () => {
         setOpenWord(false);
     };
 
-    const handleAddWord = async () => {
-        const snapshot = await get(child(dbRef, `${selectedItem}/Vocabulary`));
-        const length = Object.keys(snapshot.val()).length;
+    const handleSearch = (event) => {
+        setSearchTerm(event.target.value);
+    };
 
+    const handleDelete = (id) => {
+        setIdToDelete(id);
+        setShowConfirm(true);
+    };
+
+    const confirmDelete = async () => {
+        try {
+            const itemPath = `${selectedItem}/Vocabulary/c${idToDelete}`;
+            console.log(itemPath);
+            await remove(child(dbRef, itemPath));
+            
+            const updatedData = dataModal.filter((item) => item.id !== idToDelete);
+            setDataModal(updatedData);
+            
+            console.log(`Đã xóa từ vựng với id ${idToDelete}`);
+        } catch (error) {
+            console.error("Lỗi khi xóa từ vựng:", error);
+        } finally {
+            setShowConfirm(false);
+            setIdToDelete(null);
+        }
+    };
+    
+
+    const cancelDelete = () => {
+        setShowConfirm(false);
+        setIdToDelete(null);
+    };
+
+    const handleAddWord = async () => {
         if (word === '' || translate === '') {
-            message.error('Thêm thất bại', 1.5);
+            message.error('Vui lòng nhập từ và nghĩa của từ!', 1.5);
             return;
         }
 
-        const dataAdd = {
-            id: length + 1,
-            question: word,
-            answer: translate,
-        };
+        const vocabularyRef = child(dbRef, `${selectedItem}/Vocabulary`);
 
-        const path = `${selectedItem}/Vocabulary/c${length + 1}`;
-        set(ref(database, path), dataAdd);
-        setTranslate('');
-        setWord('');
-        message.success('Thêm thành công', 1.5);
+        try {
+            const vocabSnapshot = await get(vocabularyRef);
+            const length = vocabSnapshot.exists() ? Object.keys(vocabSnapshot.val()).length : 0;
+
+            const newWord = {
+                id: length + 1,
+                question: word,
+                answer: translate,
+            };
+
+            const newWordRef = child(vocabularyRef, `c${length + 1}`);
+            await set(newWordRef, newWord);
+
+            setWord('');
+            setTranslate('');
+            message.success('Thêm từ thành công!', 1.5);
+        } catch (error) {
+            console.error('Lỗi khi thêm từ mới:', error);
+            message.error('Thêm từ thất bại. Vui lòng thử lại!', 1.5);
+        }
     };
 
     if (!load) {
@@ -107,12 +163,12 @@ export default function Lesson() {
                 {Object.keys(data).map((item, index) => (
                     <div key={item} className={styles.Lesson}>
                         <Link to={`/Objectquiz/${item}`}>
-                            <Button disabled={vocabularyLengths[item] < 3} style={{ width: '200px' }}>
+                            <Button disabled={vocabularyLengths[item] <= 3} style={{ width: '200px' }}>
                                 {item}
                             </Button>
                         </Link>
-                        <Button onClick={() => showModal(item)}>+</Button> {/* Gọi showModal với tham số `item` */}
-                        <Button onClick={() => showModalWord(item)}><DatabaseOutlined /></Button> {/* Gọi showModal với tham số `item` */}
+                        <Button onClick={() => showModal(item)}>+</Button>
+                        <Button onClick={() => showModalWord(item)}><DatabaseOutlined /></Button>
                     </div>
                 ))}
             </div>
@@ -125,21 +181,17 @@ export default function Lesson() {
                 okText="Thêm"
                 cancelText="Thoát"
             >
-                <label htmlFor="Word" className={styles.label}>
-                    Từ tiếng Anh:
-                </label>
+                <label htmlFor="Word">Từ tiếng Anh:</label>
                 <Input
                     id="Word"
-                    placeholder="Từ vựng"
+                    placeholder="Nhập từ vựng"
                     value={word}
                     onChange={(e) => setWord(e.target.value)}
                 />
-                <label style={{ marginTop: '5px' }} htmlFor="Translate" className={styles.label}>
-                    Nghĩa tiếng Việt:
-                </label>
+                <label htmlFor="Translate" style={{ marginTop: '10px', display: 'block' }}>Nghĩa tiếng Việt:</label>
                 <Input
                     id="Translate"
-                    placeholder="Nghĩa của từ"
+                    placeholder="Nhập nghĩa của từ"
                     value={translate}
                     onChange={(e) => setTranslate(e.target.value)}
                 />
@@ -147,14 +199,41 @@ export default function Lesson() {
 
             {/* Modal Danh sách từ */}
             <Modal
-                title="Danh sách từ"
+                className='custom-modal-2'
+                title="Danh sách từ vựng"
                 open={openWord}
-                // onOk={handleAddWord}
                 onCancel={hideModalWord}
-                okText="Thêm"
-                cancelText="Thoát"
+                footer={null}
             >
-                
+                <Input
+                    type="text"
+                    placeholder="Tìm từ tiếng Anh..."
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    style={{ marginBottom: '10px' }}
+                />
+                <div className={styles.ListWordModal}>
+                    <div className={styles.Layout}>
+                        {dataModal
+                            .filter((item) => item.question.toLowerCase().includes(searchTerm.toLowerCase()))
+                            .map((item) => (
+                                <div key={item.id} style={{ marginBottom: '15px', width: '40%' }}>
+                                    <p><strong>Id: {item.id}</strong></p>
+                                    <p><strong>Từ tiếng Anh:</strong> {item.question}</p>
+                                    <p><strong>Nghĩa:</strong> {item.answer}</p>
+                                </div>
+                            ))}
+                    </div>
+                    <Modal
+                        title="Xác nhận xóa từ vựng"
+                        open={showConfirm}
+                        onOk={confirmDelete}
+                        onCancel={cancelDelete}
+                    >
+                        <p>Bạn có chắc chắn muốn xóa từ vựng này?</p>
+                    </Modal>
+
+                </div>
             </Modal>
         </div>
     );
