@@ -50,11 +50,45 @@
     right: 0px;
 }
 
-.next {
+.navigateFooter{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+}
+
+
+.NumberQuestion{
+    height: 40px;
+    border: 2px solid black;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    width: 200px;
+    overflow: hidden;
+    box-sizing: content-box;
+    position: relative;
+    justify-content: center;
+}
+
+.NumberQuestion::before{
+    content: " ";
+    position: absolute;
+    display: flex;
+    background-color:gray;
+    top: 0;
+    height: 40px;
+    left: 0;
+    transition: all 0.5s;
+    width: var(--beforeWidth, 0%);
+}
+/* .next {
     position: absolute;
     bottom: 20px;
     right: 0;
-}
+} */
 
 .next > button{
     height: 40px;
@@ -70,11 +104,11 @@
     background-color: red;
 }
 
-.quit{
+/* .quit{
     position: absolute;
     bottom: 20px;
     left: 0;
-}
+} */
 
 .quit > button{
     height: 40px;
@@ -120,4 +154,18 @@
     .next, .quit{
         bottom: -45px;
     }
+
+    .navigateFooter{
+        bottom: -47px !important;
+    }
+
+   
+
+    .Lesson{
+        display: flex !important;
+        justify-content: space-between !important;
+    }
+    /* .NumberQuestion{
+        background-color: rgb(25, 214, 25) !important;
+    } */
   }

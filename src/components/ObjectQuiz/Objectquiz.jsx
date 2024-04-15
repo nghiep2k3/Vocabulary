@@ -13,6 +13,8 @@ export default function Objectquiz() {
     const { quiz } = useParams();
     const [data, setData] = useState({});
     const [load, setLoad] = useState(true);
+    const [percentQuiz, setPercentQuiz] = useState(0);
+    const [Chargewidth, setChargeWidth] = useState(0);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState([]);
     const [correctAnswer, setCorrectAnswer] = useState("");
@@ -39,6 +41,8 @@ export default function Objectquiz() {
                 if (snapshot.exists()) {
                     setData(snapshot.val());
                     setCount2(Object.keys(snapshot.val()).length);
+                    setPercentQuiz(100 / Object.keys(snapshot.val()).length);
+                    setChargeWidth(100 / Object.keys(snapshot.val()).length);
                     setLoad(false);
                 } else {
                     console.log("Không có dữ liệu");
@@ -66,6 +70,7 @@ export default function Objectquiz() {
         }
     }, [load, data]);
 
+
     const setQuestionAndAnswers = (quizData, index) => {
         const { question, answer } = quizData[`c${index + 1}`];
 
@@ -90,6 +95,7 @@ export default function Objectquiz() {
         const defaultColor = getRandomColor();
         setAnswerColor(defaultColor);
     };
+
 
     const handleNextQuestion = () => {
         setAnimate('animate__animated animate__backOutDown');
@@ -117,7 +123,7 @@ export default function Objectquiz() {
             setColorIndex(0);
             return;
         }
-
+        setPercentQuiz(prevWidth => prevWidth + Chargewidth);
         setTimeout(() => {
             setQuestionAndAnswers(shuffledQuizData, currentQuestionIndex + 1);
             setCount1(count1 + 1);
@@ -125,6 +131,17 @@ export default function Objectquiz() {
             setColorIndex(colorIndex + answers.length);
         }, 1000);
     };
+
+    useEffect(() => {
+        const element = document.querySelector('.NumberQuestion');
+        if (!element) return;
+        const style = window.getComputedStyle(element, '::before');
+        const width = style.getPropertyValue('width');
+        const parsedWidth = parseFloat(width);
+        setPercentQuiz(parsedWidth);
+      }, []);
+      
+      
 
     const ButtonStart = () => {
         setStart(true);
@@ -165,6 +182,7 @@ export default function Objectquiz() {
     const checkAnswer = (selectedAnswer) => {
         if (selectedAnswer === correctAnswer) {
             setMessage("Chính xác!");
+            setPercentQuiz(prevWidth => prevWidth + Chargewidth);
             setShowMessage(true);
             setTimeout(() => {
                 handleNextQuestion();
@@ -203,8 +221,8 @@ export default function Objectquiz() {
 
     return (
         <div className={styles.backgroundQuiz}>
-            { playAudio()}
-            <div style={{display: 'none'}}>
+            {playAudio()}
+            <div style={{ display: 'none' }}>
                 <audio src={linkSrc[0]} ref={audioRef} controls>
                 </audio>
             </div>
@@ -242,15 +260,21 @@ export default function Objectquiz() {
                         />
                     )}
                 </div>
-                <div className={styles.next}>
-                    <button onClick={handleNextQuestion}>
-                        <CaretRightOutlined style={{ fontSize: '25px', color: '#333' }} />
-                    </button>
-                </div>
-                <div className={styles.quit}>
-                    <button onClick={AgainQuiz}>
-                        <UndoOutlined style={{ fontSize: '25px', color: '#333' }} />
-                    </button>
+                <div className={styles.navigateFooter}>
+                    {console.log(1111,percentQuiz)}
+                    <div className={styles.quit}>
+                        <button onClick={AgainQuiz}>
+                            <UndoOutlined style={{ fontSize: '25px', color: '#333' }} />
+                        </button>
+                    </div>
+                    <div className={styles.NumberQuestion}  style={{ '--beforeWidth': `${percentQuiz}%` }}>
+                        <div style={{textAlign: 'center', color: 'white', zIndex: '99'}}>{count1}/{count2}</div>
+                    </div>
+                    <div className={styles.next}>
+                        <button onClick={handleNextQuestion}>
+                            <CaretRightOutlined style={{ fontSize: '25px', color: '#333' }} />
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

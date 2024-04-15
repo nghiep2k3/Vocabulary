@@ -5,7 +5,7 @@ import { Button, Modal, Input, message } from 'antd';
 import { ref, get, child, set, remove } from 'firebase/database';
 import { database } from '../../firebase';
 import Header from '../Header/Header';
-import { DatabaseOutlined } from '@ant-design/icons';
+import { CloseOutlined, DatabaseOutlined } from '@ant-design/icons';
 
 export default function Lesson() {
     const dbRef = ref(database);
@@ -159,7 +159,7 @@ export default function Lesson() {
         <div className={styles.container}>
             <Header />
             <h1 style={{ textTransform: 'uppercase', textAlign: 'center' }}>Danh sách bài học</h1>
-            <div>
+            <div className={styles.NavigateLesson}>
                 {Object.keys(data).map((item, index) => (
                     <div key={item} className={styles.Lesson}>
                         <Link to={`/Objectquiz/${item}`}>
@@ -169,6 +169,7 @@ export default function Lesson() {
                         </Link>
                         <Button onClick={() => showModal(item)}>+</Button>
                         <Button onClick={() => showModalWord(item)}><DatabaseOutlined /></Button>
+                        <Button><CloseOutlined /></Button>
                     </div>
                 ))}
             </div>
@@ -219,6 +220,7 @@ export default function Lesson() {
                             .map((item) => (
                                 <div key={item.id} style={{ marginBottom: '15px', width: '40%' }}>
                                     <p><strong>Id: {item.id}</strong></p>
+                                    {/* <p><strong>Id: {item.id}</strong> <button onClick={() => handleDelete(item.id)}>Xóa</button></p> */}
                                     <p><strong>Từ tiếng Anh:</strong> {item.question}</p>
                                     <p><strong>Nghĩa:</strong> {item.answer}</p>
                                 </div>

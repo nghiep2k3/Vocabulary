@@ -83,7 +83,7 @@ export default function Header() {
     };
 
     const HomePage = () => {
-        navigate("/Objectquiz");
+        navigate("/Lesson");
     };
 
     const menu = (

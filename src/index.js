@@ -5,7 +5,7 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Objectquiz from "./components/ObjectQuiz/Objectquiz";
-import Test from "./components/Lesson/Lesson";
+import Lesson from "./components/Lesson/Lesson";
 import ListWord from "./components/ListWord/ListWord";
 import Dev from "./components/Dev/Dev";
 
@@ -19,8 +19,8 @@ root.render(
           <Route path="/Objectquiz/:quiz" element={<Objectquiz />} />
         </Route>
 
-        <Route  path="Lesson" element={<Test />} />
-        <Route  index element={<Test />} />
+        <Route  path="Lesson" element={<Lesson />} />
+        <Route  index element={<Lesson />} />
         <Route path="/ListWord" element={<ListWord />} />
         <Route path="/Dev" element={<Dev />} />
       </Routes>
