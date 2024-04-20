@@ -1,26 +1,25 @@
-import React, { useRef } from 'react';
-import link from '../../assets/fakelove.mp3'
+import React from 'react';
 
-const App = () => {
-  const audioRef = useRef(null);
-
-  const playAudio = () => {
-    const audioElement = audioRef.current;
-    if (audioElement) {
-      audioElement.play(); // Phát âm thanh nếu audioElement tồn tại
-    }
-  };
-
+function ComponentA({ toggleMusic }) {
   return (
     <div>
-      <h1>Phát Nhạc Khi Ấn Nút</h1>
-      <button onClick={playAudio}>Phát Nhạc</button>
-      <audio ref={(element) => (audioRef.current = element)}>
-        <source src={link} type="audio/mp3" />
-        Your browser does not support the audio element.
-      </audio>
+      <button onClick={toggleMusic}>Toggle Music</button>
     </div>
   );
-};
+}
 
-export default App;
+export default ComponentA;
+
+
+// const playAudio = () => {
+//   const audioElement = document.getElementById('audioElement');
+//   if (audioElement) {
+//       if (isPlaying) {
+//           audioElement.play().catch(error => {
+//               console.error('Error playing audio:', error);
+//           });
+//       } else {
+//           audioElement.pause();
+//       }
+//   }
+// };

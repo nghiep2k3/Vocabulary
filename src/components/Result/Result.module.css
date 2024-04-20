@@ -1,0 +1,28 @@
+.Container {
+    height: 300px;
+    width: 600px;
+    background-color: white;
+    border-radius: 20px;
+    overflow: hidden; /* Ẩn thanh cuộn khi không cần thiết */
+    padding: 20px;
+}
+
+.ResultQuiz {
+    height: 50px;
+    margin: 10px 0;
+}
+
+.Text {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 30px;
+}
+
+.FooterList {
+    max-height: 200px; /* Chiều cao tối đa của FooterList */
+    overflow-y: auto; /* Hiển thị thanh cuộn dọc khi cần thiết */
+    padding: 10px;
+}
+.FooterList::-webkit-scrollbar {
+    width: 8px;
+}
