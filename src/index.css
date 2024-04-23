@@ -4,6 +4,11 @@
   box-sizing: border-box;
 }
 
+.App {
+  background-color: black;
+  height: 100vh;
+}
+
 .ant-alert {
   height: 60px !important;
 }
@@ -51,10 +56,10 @@
 }
 
 
-.ant-dropdown-trigger{
+.ant-dropdown-trigger {
   /* background-color: black !important; */
 }
 
-.ant-dropdown-open{
+.ant-dropdown-open {
   background-color: black !important;
 }

@@ -7,8 +7,6 @@ import { database } from '../../firebase';
 import Header from '../Header/Header';
 import { CloseOutlined, DatabaseOutlined } from '@ant-design/icons';
 
-import Dev from "../Dev/Dev"
-import Dev2 from "../Dev/Dev2"
 
 export default function Lesson() {
     const dbRef = ref(database);
@@ -18,7 +16,6 @@ export default function Lesson() {
     const [openWord, setOpenWord] = useState(false);
     const [word, setWord] = useState('');
     const [translate, setTranslate] = useState('');
-    const [itemEdit, setItemEdit] = useState();
     const [editWord, setEditWord] = useState('');
     const [editTranslate, setEditTranslate] = useState('');
     const [selectedItem, setSelectedItem] = useState('');
@@ -31,10 +28,7 @@ export default function Lesson() {
     const [idToDelete, setIdToDelete] = useState(null);
     const [idEdit, setIdEdit] = useState(null);
 
-    const [musicPlaying, setMusicPlaying] = useState(false);
-    const toggleMusic = () => {
-        setMusicPlaying((prevState) => !prevState);
-    };
+
     useEffect(() => {
         const fetchVocabularyLengths = async () => {
             const snapshot = await get(dbRef);
@@ -42,7 +36,6 @@ export default function Lesson() {
             if (snapshot.exists()) {
                 const dataValue = snapshot.val();
                 setData(dataValue);
-                setLoad(true);
 
                 const lengths = {};
 
@@ -62,7 +55,7 @@ export default function Lesson() {
                         lengths[key] = 0;
                     }
                 }
-
+                setLoad(true);
                 setVocabularyLengths(lengths);
             }
         };
@@ -222,13 +215,13 @@ export default function Lesson() {
     };
 
     if (!load) {
-        return <div>Đang tải...</div>;
+        return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'white' }}>Đang tải...</div>;
     }
 
     return (
         <div className={styles.container}>
             <Header />
-            <h1 style={{ textTransform: 'uppercase', textAlign: 'center' }}>Danh sách bài học</h1>
+            <h1 style={{ textAlign: 'center' }}>Danh sách bài học</h1>
             <div className={styles.NavigateLesson}>
                 {Object.keys(data).map((item, index) => (
                     <div key={item} className={styles.Lesson}>
@@ -245,11 +238,6 @@ export default function Lesson() {
 
             </div>
 
-            <div>
-                <h1>Music Player App</h1>
-                <Dev toggleMusic={toggleMusic} />
-                <Dev2 musicPlaying={musicPlaying} />
-            </div>
             {/* Modal Thêm từ */}
             <Modal
                 title="Thêm từ vựng"

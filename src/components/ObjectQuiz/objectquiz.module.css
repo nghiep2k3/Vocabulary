@@ -131,11 +131,17 @@
     height: 200px;
     font-size: 25px;
     font-weight: bold;
+    cursor: pointer;
     color: white;
+    margin: 0 10px;
     width: 370px;
     display: inline-flex;
     align-items: center;
     justify-content: space-around;
+}
+
+.answer:hover{
+    opacity: 0.8;
 }
 
 @media screen and (max-width: 767px) {

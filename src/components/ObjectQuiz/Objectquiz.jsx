@@ -5,8 +5,11 @@ import { CaretRightOutlined, UndoOutlined } from '@ant-design/icons';
 import { database } from "../../firebase";
 import 'animate.css';
 import styles from "./objectquiz.module.css";
+import correctQuiz from "../../assets/Dung.mp3";
+import wrongQuiz from "../../assets/Sai.mp3";
 import link from '../../assets/fakelove.mp3';
 import link2 from '../../assets/Lanterns.mp3';
+import link3 from '../../assets/Xichlinh.mp3';
 import { child, get, ref, set } from "firebase/database";
 import { useAudioContext } from '../../AudioContext';
 
@@ -30,13 +33,19 @@ export default function Objectquiz() {
     const [message, setMessage] = useState("");
     const [animate, setAnimate] = useState('');
     const [answerColor, setAnswerColor] = useState('');
-    const [linkSrc, setLinkSrc] = useState([link, link2]);
+    const [linkSrc, setLinkSrc] = useState([link, link2, link3]);
+    const [correctAudioSrc, setCorrectAudioSrc] = useState(correctQuiz);
+    const [wrongAudioSrc, setWrongAudioSrc] = useState(wrongQuiz);
     const colors = ['#00DD00', 'orange', '#FF3300', 'black', '#FF99CC', '#996600', '#708090', '#8B8989', 'black', '#FF99CC', '#00DD00', 'orange', '#708090', 'orange', '#FF3300', 'black'];
     const [colorIndex, setColorIndex] = useState(0);
     const [questionTrue, setQuestionTrue] = useState(0);
     const [questionFalse, setQuestionFalse] = useState(0);
     const [questionUndefine, setQuestionUndefine] = useState(0);
-    const audioRef = useRef(null); // Tham chiếu tới phần tử audio
+    const [currentSrcIndex, setCurrentSrcIndex] = useState(0);
+    const audioRef = useRef(null);
+    const correctAudioRef = useRef(null);
+    const wrongAudioRef = useRef(null);
+
     const dbRef = ref(database);
 
     useEffect(() => {
@@ -75,6 +84,14 @@ export default function Objectquiz() {
         }
     }, [load, data]);
 
+    useEffect(() => {
+        const getRandomIndex = () => {
+            return Math.floor(Math.random() * linkSrc.length);
+        };
+
+        const newIndex = getRandomIndex();
+        setCurrentSrcIndex(newIndex);
+    }, [linkSrc]);
 
     const setQuestionAndAnswers = (quizData, index) => {
         const { question, answer } = quizData[`c${index + 1}`];
@@ -176,6 +193,7 @@ export default function Objectquiz() {
             } else {
                 audioElement.pause();
             }
+            audioElement.volume = 0.7;
         }
     };
 
@@ -208,7 +226,12 @@ export default function Objectquiz() {
                 setPercentQuiz(percentQuiz + Chargewidth);
                 setQuestionTrue(questionTrue + 1);
                 handleNextQuestion();
-            }, 1700)
+            }, 1700);
+
+            // Phát âm thanh đúng
+            correctAudioRef.current.src = correctQuiz;
+            correctAudioRef.current.play();
+            correctAudioRef.current.volume = 1;
         } else {
             setMessage("Sai rồi. Hãy thử lại!");
             setShowMessage2(true);
@@ -216,7 +239,11 @@ export default function Objectquiz() {
                 setPercentQuiz(percentQuiz + Chargewidth);
                 setQuestionFalse(questionFalse + 1);
                 handleNextQuestion();
-            }, 1700)
+            }, 1700);
+            wrongAudioRef.current.src = wrongQuiz;
+            wrongAudioRef.current.play();
+            wrongAudioRef.current.volume = 1;
+
         }
 
         setTimeout(() => {
@@ -225,6 +252,7 @@ export default function Objectquiz() {
             setMessage("");
         }, 1700);
     };
+
 
     const getRandomColor = () => {
         const index = Math.floor(Math.random() * colors.length);
@@ -244,19 +272,30 @@ export default function Objectquiz() {
         );
     }
 
+
+
     const { question } = shuffledQuizData[`c${currentQuestionIndex + 1}`];
-    // console.log(Chargewidth);
     return (
         <div className={styles.backgroundQuiz}>
             {playAudio()}
             <div style={{ display: 'none' }}>
-                <audio loop src={linkSrc[0]} ref={audioRef} controls>
+                <audio loop src={linkSrc[currentSrcIndex]} ref={audioRef} controls>
                 </audio>
+            </div>
+
+            <div style={{ display: 'none' }}>
+                <audio ref={correctAudioRef}></audio>
+            </div>
+
+
+            <div style={{ display: 'none' }}>
+                <audio ref={wrongAudioRef}></audio>
             </div>
             <div style={{ width: '100%' }}>
                 <div key={`question-${currentQuestionIndex}`}>
                     <p className={`${styles.quiz} ${animate}`}>{question}</p>
-                    <p>{questionTrue} - {questionFalse}</p>
+                    {/* <button onClick={Kq}>Kết quả</button> */}
+                    {/* <p>{questionTrue} - {questionFalse}</p> */}
                 </div>
                 <div className={styles.allQuiz}>
                     {answers.map((answer, index) => (
@@ -278,6 +317,7 @@ export default function Objectquiz() {
                             message={message}
                             type="success"
                         />
+
                     )}
                     {showMessage2 && (
                         <Alert

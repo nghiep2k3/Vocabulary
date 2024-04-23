@@ -22,7 +22,6 @@ export default function Header() {
         { id: 1, name: "Fake Love", src: link },
         { id: 2, name: "Lanterns", src: link2 }
     ]);
-    const [isPaused, setIsPaused] = useState(false);
 
     const showModal = () => {
         setOpen(true);
@@ -132,7 +131,6 @@ export default function Header() {
                     value={titleLesson}
                     onChange={(e) => setTitleLesson(e.target.value)}
                 />
-                <Button onClick={handleAddWord}>Thêm</Button>
             </Modal>
             <Modal
                 title="Cài đặt"
