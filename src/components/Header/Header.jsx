@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './Header.module.css';
 import { SettingOutlined, UnorderedListOutlined } from '@ant-design/icons';
-import { Button, Modal, Input, message, Dropdown, Menu } from 'antd';
+import { Button, Modal, Input, message, Dropdown, Menu, Form } from 'antd';
 import { child, get, ref, set } from 'firebase/database';
 import { database } from '../../firebase';
 import link from '../../assets/fakelove.mp3';
@@ -65,13 +65,13 @@ export default function Header() {
         const Length = Object.keys(snapshot.val()).length;
 
         const dataAdd = {
-            id: Length + 1,
+            id: 1,
             question: "",
             answer: "",
         };
 
-        const path = `${titleLesson}/Vocabulary/c1`;
-        set(ref(database, path), dataAdd);
+        const path = `${titleLesson}/Vocabulary/`;
+        set(ref(database, path), "");
         setLength(length + 1);
         setTitleLesson('');
         message.success('Thêm thành công', 1.5);

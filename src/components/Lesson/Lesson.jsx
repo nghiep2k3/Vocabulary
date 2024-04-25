@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Lesson.module.css';
 import { Link } from 'react-router-dom';
-import { Button, Modal, Input, message } from 'antd';
+import { Button, Modal, Input, message, Form } from 'antd';
 import { ref, get, child, set, remove } from 'firebase/database';
 import { database } from '../../firebase';
 import Header from '../Header/Header';
@@ -10,6 +10,7 @@ import { CloseOutlined, DatabaseOutlined } from '@ant-design/icons';
 
 export default function Lesson() {
     const dbRef = ref(database);
+    const [form] = Form.useForm();
     const [data, setData] = useState({});
     const [dataModal, setDataModal] = useState([]);
     const [open, setOpen] = useState(false);
@@ -184,8 +185,10 @@ export default function Lesson() {
         setIdEdit(null);
     };
 
-    const handleAddWord = async () => {
-        if (word === '' || translate === '') {
+    const handleAddWord = async (values) => {
+        const { word, translate } = values;
+
+        if (!word || !translate) {
             message.error('Vui lòng nhập từ và nghĩa của từ!', 1.5);
             return;
         }
@@ -195,24 +198,26 @@ export default function Lesson() {
         try {
             const vocabSnapshot = await get(vocabularyRef);
             const length = vocabSnapshot.exists() ? Object.keys(vocabSnapshot.val()).length : 0;
-
+            console.log(length);
             const newWord = {
                 id: length + 1,
-                question: word,
-                answer: translate,
+                question: translate,
+                answer: word,
             };
 
             const newWordRef = child(vocabularyRef, `c${length + 1}`);
+            console.log(newWord);
             await set(newWordRef, newWord);
-
-            setWord('');
-            setTranslate('');
+            form.resetFields();
+            // setWord('');
+            // setTranslate('');
             message.success('Thêm từ thành công!', 1.5);
         } catch (error) {
             console.error('Lỗi khi thêm từ mới:', error);
             message.error('Thêm từ thất bại. Vui lòng thử lại!', 1.5);
         }
     };
+
 
     if (!load) {
         return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'white' }}>Đang tải...</div>;
@@ -242,26 +247,40 @@ export default function Lesson() {
             <Modal
                 title="Thêm từ vựng"
                 open={open}
-                onOk={handleAddWord}
                 onCancel={hideModal}
+                onOk={() => form.submit()}
                 okText="Thêm"
                 cancelText="Thoát"
             >
-                <label htmlFor="Word">Từ tiếng Anh:</label>
-                <Input
-                    id="Word"
-                    placeholder="Nhập từ vựng"
-                    value={word}
-                    onChange={(e) => setWord(e.target.value)}
-                />
-                <label htmlFor="Translate" style={{ marginTop: '10px', display: 'block' }}>Nghĩa tiếng Việt:</label>
-                <Input
-                    id="Translate"
-                    placeholder="Nhập nghĩa của từ"
-                    value={translate}
-                    onChange={(e) => setTranslate(e.target.value)}
-                />
+                <Form form={form} onFinish={handleAddWord}>
+                    <Form.Item
+                        label="Từ tiếng Anh:"
+                        name="word"
+                    // rules={[{ required: true, message: 'Vui lòng nhập từ tiếng Anh!' }]}
+                    >
+                        <Input
+                            style={{ position: 'absolute', right: '0', top: '0', width: "350px" }}
+                            placeholder="Nhập từ vựng"
+                            onPressEnter={() => form.submit()}
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        label="Nghĩa tiếng Việt:"
+                        name="translate"
+                    // rules={[{ required: true, message: 'Vui lòng nhập nghĩa của từ!' }]}
+                    >
+                        <Input
+                            style={{ position: 'absolute', right: '0', top: '0', width: "350px" }}
+
+                            placeholder="Nhập nghĩa của từ"
+                            onPressEnter={() => form.submit()}
+                        />
+                    </Form.Item>
+                </Form>
             </Modal>
+
+
+
 
             {/* Modal Danh sách từ */}
             <Modal
