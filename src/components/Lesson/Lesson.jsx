@@ -7,6 +7,7 @@ import { database } from '../../firebase';
 import Header from '../Header/Header';
 import { CloseOutlined, DatabaseOutlined } from '@ant-design/icons';
 
+
 export default function Lesson() {
     const dbRef = ref(database);
     const [data, setData] = useState({});
@@ -15,12 +16,18 @@ export default function Lesson() {
     const [openWord, setOpenWord] = useState(false);
     const [word, setWord] = useState('');
     const [translate, setTranslate] = useState('');
+    const [editWord, setEditWord] = useState('');
+    const [editTranslate, setEditTranslate] = useState('');
     const [selectedItem, setSelectedItem] = useState('');
     const [load, setLoad] = useState(false);
     const [vocabularyLengths, setVocabularyLengths] = useState({});
     const [searchTerm, setSearchTerm] = useState('');
     const [showConfirm, setShowConfirm] = useState(false);
+    const [showConfirmLesson, setShowConfirmLesson] = useState(false);
+    const [showConfirmDeleteLesson, setShowConfirmDeleteLesson] = useState(false);
     const [idToDelete, setIdToDelete] = useState(null);
+    const [idEdit, setIdEdit] = useState(null);
+
 
     useEffect(() => {
         const fetchVocabularyLengths = async () => {
@@ -29,7 +36,6 @@ export default function Lesson() {
             if (snapshot.exists()) {
                 const dataValue = snapshot.val();
                 setData(dataValue);
-                setLoad(true);
 
                 const lengths = {};
 
@@ -49,7 +55,7 @@ export default function Lesson() {
                         lengths[key] = 0;
                     }
                 }
-
+                setLoad(true);
                 setVocabularyLengths(lengths);
             }
         };
@@ -92,33 +98,90 @@ export default function Lesson() {
         setSearchTerm(event.target.value);
     };
 
-    const handleDelete = (id) => {
-        setIdToDelete(id);
+
+    const handleEdit = async (id) => {
+        console.log(id);
+        setIdEdit(id);
+        console.log(selectedItem);
+        const vocabularyRef = child(dbRef, `${selectedItem}/Vocabulary/c${id}`);
+        try {
+            const vocabSnapshot = await get(vocabularyRef);
+
+            if (vocabSnapshot.exists()) {
+                const vocabData = vocabSnapshot.val();
+                console.log(vocabData);
+                setEditWord(vocabSnapshot.val().question);
+                setEditTranslate(vocabSnapshot.val().answer);
+            }
+        } catch (error) {
+            console.error(`Lỗi khi lấy danh sách từ vựng cho ${selectedItem}:`, error);
+        }
         setShowConfirm(true);
+    }
+
+    const handleDeleteLesson = (item) => {
+        setSelectedItem(item);
+        setShowConfirmDeleteLesson(true);
     };
 
-    const confirmDelete = async () => {
+
+    const cancelDeleteLesson = () => {
+        setShowConfirmDeleteLesson(false);
+        setIdToDelete(null);
+    };
+
+    const ConfirmDeleteLesson = async () => {
         try {
-            const itemPath = `${selectedItem}/Vocabulary/c${idToDelete}`;
-            console.log(itemPath);
+            const itemPath = `${selectedItem}`;
             await remove(child(dbRef, itemPath));
-            
-            const updatedData = dataModal.filter((item) => item.id !== idToDelete);
-            setDataModal(updatedData);
-            
-            console.log(`Đã xóa từ vựng với id ${idToDelete}`);
+
+            const updatedData = Object.keys(data).filter(key => key !== selectedItem).reduce((obj, key) => {
+                obj[key] = data[key];
+                return obj;
+            }, {});
+
+            // Cập nhật state data mới đã xóa bài học
+            setData(updatedData);
+
+            // Gửi tin nhắn thành công
+
+            // Đặt lại các state và đóng modal
+            setShowConfirmDeleteLesson(false);
+            setSelectedItem(null);
+
+            message.success(`Xóa thành công`);
+        } catch (error) {
+            console.error("Lỗi khi xóa bài học:", error);
+            message.error("Đã xảy ra lỗi khi xóa bài học. Vui lòng thử lại sau.");
+        }
+    };
+
+
+
+    const confirmEdit = async () => {
+        try {
+            const itemPath = `${selectedItem}/Vocabulary/c${idEdit}`;
+            console.log(itemPath);
+            const newWord = {
+                id: idEdit,
+                question: editWord,
+                answer: editTranslate,
+            };
+
+            await set(ref(database, itemPath), newWord);
+
         } catch (error) {
             console.error("Lỗi khi xóa từ vựng:", error);
         } finally {
             setShowConfirm(false);
-            setIdToDelete(null);
+            setIdEdit(null);
         }
     };
-    
 
-    const cancelDelete = () => {
+
+    const cancelEdit = () => {
         setShowConfirm(false);
-        setIdToDelete(null);
+        setIdEdit(null);
     };
 
     const handleAddWord = async () => {
@@ -152,13 +215,13 @@ export default function Lesson() {
     };
 
     if (!load) {
-        return <div>Đang tải...</div>;
+        return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'white' }}>Đang tải...</div>;
     }
 
     return (
         <div className={styles.container}>
             <Header />
-            <h1 style={{ textTransform: 'uppercase', textAlign: 'center' }}>Danh sách bài học</h1>
+            <h1 style={{ textAlign: 'center' }}>Danh sách bài học</h1>
             <div className={styles.NavigateLesson}>
                 {Object.keys(data).map((item, index) => (
                     <div key={item} className={styles.Lesson}>
@@ -169,10 +232,12 @@ export default function Lesson() {
                         </Link>
                         <Button onClick={() => showModal(item)}>+</Button>
                         <Button onClick={() => showModalWord(item)}><DatabaseOutlined /></Button>
-                        <Button><CloseOutlined /></Button>
+                        <Button onClick={() => handleDeleteLesson(item)}><CloseOutlined /></Button>
                     </div>
                 ))}
+
             </div>
+
             {/* Modal Thêm từ */}
             <Modal
                 title="Thêm từ vựng"
@@ -219,23 +284,46 @@ export default function Lesson() {
                             .filter((item) => item.question.toLowerCase().includes(searchTerm.toLowerCase()))
                             .map((item) => (
                                 <div key={item.id} style={{ marginBottom: '15px', width: '40%' }}>
-                                    <p><strong>Id: {item.id}</strong></p>
+                                    {/* <p><strong>Id: {item.id}</strong></p> */}
                                     {/* <p><strong>Id: {item.id}</strong> <button onClick={() => handleDelete(item.id)}>Xóa</button></p> */}
+                                    <p><strong>Id: {item.id}</strong> <button onClick={() => handleEdit(item.id)}>Chỉnh sửa</button></p>
                                     <p><strong>Từ tiếng Anh:</strong> {item.question}</p>
                                     <p><strong>Nghĩa:</strong> {item.answer}</p>
                                 </div>
                             ))}
                     </div>
                     <Modal
-                        title="Xác nhận xóa từ vựng"
+                        title="Chỉnh sửa từ vựng"
                         open={showConfirm}
-                        onOk={confirmDelete}
-                        onCancel={cancelDelete}
+                        onOk={confirmEdit}
+                        onCancel={cancelEdit}
                     >
-                        <p>Bạn có chắc chắn muốn xóa từ vựng này?</p>
+                        <p>Chỉnh sửa từ vựng?</p>
+                        <label htmlFor="EditWord">Câu hỏi:</label>
+                        <Input
+                            id="EditWord"
+                            placeholder="Câu hỏi..."
+                            value={editWord}
+                            onChange={(e) => setEditWord(e.target.value)}
+                        />
+                        <label htmlFor="EditTranslate" style={{ marginTop: '10px', display: 'block' }}>Đáp án:</label>
+                        <Input
+                            id="EditTranslate"
+                            placeholder="Đáp án..."
+                            value={editTranslate}
+                            onChange={(e) => setEditTranslate(e.target.value)}
+                        />
                     </Modal>
-
                 </div>
+            </Modal>
+
+            <Modal
+                title="Bạn có chắc muốn xóa bài học này không"
+                open={showConfirmDeleteLesson}
+                onOk={ConfirmDeleteLesson}
+                onCancel={cancelDeleteLesson}
+            >
+                <p>Bạn có chắc muốn xóa bài học này không?</p>
             </Modal>
         </div>
     );

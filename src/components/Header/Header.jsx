@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './Header.module.css';
 import { SettingOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { Button, Modal, Input, message, Dropdown, Menu } from 'antd';
@@ -6,16 +6,19 @@ import { child, get, ref, set } from 'firebase/database';
 import { database } from '../../firebase';
 import link from '../../assets/fakelove.mp3';
 import link2 from '../../assets/Lanterns.mp3';
-import { Route, Routes, Link, Outlet, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAudioContext } from '../../AudioContext';
 
 export default function Header() {
     const navigate = useNavigate();
     const dbRef = ref(database);
+    const audioRefs = useRef({});
     const [open, setOpen] = useState(false);
+    const { isPlaying, togglePlay } = useAudioContext();
     const [openSetting, setOpenSetting] = useState(false);
     const [titleLesson, setTitleLesson] = useState('');
     const [length, setLength] = useState(0);
-    const [linkSrc, setLinkSrc] = useState([
+    const [linkSrc] = useState([
         { id: 1, name: "Fake Love", src: link },
         { id: 2, name: "Lanterns", src: link2 }
     ]);
@@ -78,10 +81,6 @@ export default function Header() {
         navigate("/Lesson");
     };
 
-    const ListWord = () => {
-        navigate("/ListWord");
-    };
-
     const HomePage = () => {
         navigate("/Lesson");
     };
@@ -100,16 +99,22 @@ export default function Header() {
         </Menu>
     );
 
+
     return (
         <div className={styles.header}>
             <div className={styles.banner} onClick={HomePage}>Vocabulary</div>
             <div className={styles.setting}>
+                <div>
+                    <Button onClick={togglePlay}>
+                        {isPlaying  ? <span className="material-symbols-outlined">volume_up</span> : <span className="material-symbols-outlined">volume_off</span>}
+                    </Button>
+                </div>
                 <Dropdown overlay={menu} placement="bottomLeft" trigger={['click']}>
                     <Button><UnorderedListOutlined /></Button>
                 </Dropdown>
             </div>
             <Modal
-               className="custom-modal-1"
+                className="custom-modal-1"
                 title="Học là mãi mãi :)))"
                 open={open}
                 onOk={handleAddWord}
@@ -130,7 +135,6 @@ export default function Header() {
             <Modal
                 title="Cài đặt"
                 open={openSetting}
-                onOk={hideModalSetting}
                 onCancel={hideModalSetting}
                 okText="Lưu"
                 cancelText="Thoát"
@@ -138,9 +142,10 @@ export default function Header() {
                 {linkSrc.map((item) => (
                     <div key={item.id}>
                         <b>Name: {item.name}</b>
-                        <audio style={{ width: '100%' }} controls loop src={item.src}></audio>
+                        <audio ref={(el) => (audioRefs.current[item.id] = el)} style={{ width: '100%' }} controls loop src={item.src}></audio>
                     </div>
                 ))}
+
             </Modal>
         </div>
     );

@@ -1,5 +1,5 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
@@ -7,27 +7,34 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Objectquiz from "./components/ObjectQuiz/Objectquiz";
 import Lesson from "./components/Lesson/Lesson";
 import ListWord from "./components/ListWord/ListWord";
+import Result from "./components/Result/Result";
 import Dev from "./components/Dev/Dev";
+import { AudioProvider } from "./AudioContext";
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(
-  <React.StrictMode>
-    <Router>
-      <Routes>
-        <Route path="/" element={<App />}>
-          {/* <Route index element={<Objectquiz />} /> */}
-          <Route path="/Objectquiz/:quiz" element={<Objectquiz />} />
-        </Route>
+const Root = () => {
+  return (
+    <AudioProvider>
+      <Router>
+        <div style={{ background: "black", height: "100vh" }}>
+          <Routes>
+            <Route path="/" element={<App />}>
+              {/* <Route index element={<Objectquiz />} /> */}
+              <Route path="/Objectquiz/:quiz" element={<Objectquiz />} />
+              <Route path="Result" element={<Result />} />
+            </Route>
+            <Route path="/Result" element={<Result />} />
+            <Route path="/Lesson" element={<Lesson />} />
+            <Route index element={<Lesson />} />
+            <Route path="/ListWord" element={<ListWord />} />
+            <Route path="/Dev" element={<Dev />} />
+          </Routes>
+        </div>
+      </Router>
+    </AudioProvider>
+  );
+};
 
-        <Route  path="Lesson" element={<Lesson />} />
-        <Route  index element={<Lesson />} />
-        <Route path="/ListWord" element={<ListWord />} />
-        <Route path="/Dev" element={<Dev />} />
-      </Routes>
-    </Router>
-  </React.StrictMode>
-);
-
+ReactDOM.createRoot(document.getElementById("root")).render(<Root />);
 /* dùng chung header 
   <Route path="/"  element={<App />} >
       <Route path="/Test"  element={<Test />} />

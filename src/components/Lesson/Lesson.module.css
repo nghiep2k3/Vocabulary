@@ -6,6 +6,14 @@
 
 .Lesson {
     margin-bottom: 20px;
+    width: 450px;
+}
+
+.NavigateLesson {
+    margin-top: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
 }
 
 .btnLesson {
@@ -43,5 +51,10 @@
     .Lesson {
         display: flex !important;
         justify-content: space-between !important;
+    }
+
+    .NavigateLesson {
+        flex-wrap: wrap;
+
     }
 }

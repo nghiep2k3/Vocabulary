@@ -1,20 +1,26 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Alert } from 'antd';
 import { CaretRightOutlined, UndoOutlined } from '@ant-design/icons';
 import { database } from "../../firebase";
 import 'animate.css';
 import styles from "./objectquiz.module.css";
+import correctQuiz from "../../assets/Dung.mp3";
+import wrongQuiz from "../../assets/Sai.mp3";
 import link from '../../assets/fakelove.mp3';
 import link2 from '../../assets/Lanterns.mp3';
-import { child, get, ref } from "firebase/database";
+import link3 from '../../assets/Xichlinh.mp3';
+import { child, get, ref, set } from "firebase/database";
+import { useAudioContext } from '../../AudioContext';
 
 export default function Objectquiz() {
     const { quiz } = useParams();
+    const navigate = useNavigate();
+    const { isPlaying } = useAudioContext();
     const [data, setData] = useState({});
     const [load, setLoad] = useState(true);
     const [percentQuiz, setPercentQuiz] = useState(0);
-    const [Chargewidth, setChargeWidth] = useState(0);
+    const [Chargewidth, setChargeWidth] = useState(0.0);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState([]);
     const [correctAnswer, setCorrectAnswer] = useState("");
@@ -27,10 +33,18 @@ export default function Objectquiz() {
     const [message, setMessage] = useState("");
     const [animate, setAnimate] = useState('');
     const [answerColor, setAnswerColor] = useState('');
-    const [linkSrc, setLinkSrc] = useState([link, link2]);
+    const [linkSrc, setLinkSrc] = useState([link, link2, link3]);
+    const [correctAudioSrc, setCorrectAudioSrc] = useState(correctQuiz);
+    const [wrongAudioSrc, setWrongAudioSrc] = useState(wrongQuiz);
     const colors = ['#00DD00', 'orange', '#FF3300', 'black', '#FF99CC', '#996600', '#708090', '#8B8989', 'black', '#FF99CC', '#00DD00', 'orange', '#708090', 'orange', '#FF3300', 'black'];
     const [colorIndex, setColorIndex] = useState(0);
-    const audioRef = useRef(null); // Tham chiếu tới phần tử audio
+    const [questionTrue, setQuestionTrue] = useState(0);
+    const [questionFalse, setQuestionFalse] = useState(0);
+    const [questionUndefine, setQuestionUndefine] = useState(0);
+    const [currentSrcIndex, setCurrentSrcIndex] = useState(0);
+    const audioRef = useRef(null);
+    const correctAudioRef = useRef(null);
+    const wrongAudioRef = useRef(null);
 
     const dbRef = ref(database);
 
@@ -42,7 +56,7 @@ export default function Objectquiz() {
                     setData(snapshot.val());
                     setCount2(Object.keys(snapshot.val()).length);
                     setPercentQuiz(100 / Object.keys(snapshot.val()).length);
-                    setChargeWidth(100 / Object.keys(snapshot.val()).length);
+                    setChargeWidth(parseFloat(100 / Object.keys(snapshot.val()).length / 2));
                     setLoad(false);
                 } else {
                     console.log("Không có dữ liệu");
@@ -70,6 +84,14 @@ export default function Objectquiz() {
         }
     }, [load, data]);
 
+    useEffect(() => {
+        const getRandomIndex = () => {
+            return Math.floor(Math.random() * linkSrc.length);
+        };
+
+        const newIndex = getRandomIndex();
+        setCurrentSrcIndex(newIndex);
+    }, [linkSrc]);
 
     const setQuestionAndAnswers = (quizData, index) => {
         const { question, answer } = quizData[`c${index + 1}`];
@@ -105,8 +127,12 @@ export default function Objectquiz() {
         }
 
         if (count1 === count2) {
+            localStorage.setItem('True', questionTrue);
+            localStorage.setItem('False', questionFalse);
             alert("Đã hết câu hỏi...");
             setCount1(1);
+            setQuestionTrue(0);
+            setQuestionFalse(0);
             setCurrentQuestionIndex(0);
             setStart(false);
 
@@ -121,9 +147,14 @@ export default function Objectquiz() {
             setShuffledQuizData(newShuffledQuizData);
             setQuestionAndAnswers(newShuffledQuizData, 0);
             setColorIndex(0);
+            localStorage.setItem('True', questionTrue);
+            localStorage.setItem('False', questionFalse);
+            localStorage.setItem('questionUndefine', questionUndefine);
+            navigate("/Result");
             return;
         }
         setPercentQuiz(prevWidth => prevWidth + Chargewidth);
+        setQuestionUndefine(questionUndefine + 1);
         setTimeout(() => {
             setQuestionAndAnswers(shuffledQuizData, currentQuestionIndex + 1);
             setCount1(count1 + 1);
@@ -139,12 +170,13 @@ export default function Objectquiz() {
         const width = style.getPropertyValue('width');
         const parsedWidth = parseFloat(width);
         setPercentQuiz(parsedWidth);
-      }, []);
-      
-      
+    }, []);
+
+
 
     const ButtonStart = () => {
         setStart(true);
+        // SetPlayMusic(true);
         setQuestionAndAnswers(shuffledQuizData, 0);
         setAnimate('animate__animated animate__backInLeft');
         setTimeout(() => setAnimate(''), 1000);
@@ -152,16 +184,23 @@ export default function Objectquiz() {
 
     const playAudio = () => {
         const audioElement = audioRef.current;
+        console.log(isPlaying);
         if (audioElement) {
-            audioElement.play().catch(error => {
-                console.error('Error playing audio:', error);
-            });
+            if (isPlaying) {
+                audioElement.play().catch(error => {
+                    console.error('Error playing audio:', error);
+                });
+            } else {
+                audioElement.pause();
+            }
+            audioElement.volume = 0.7;
         }
     };
 
-
     const AgainQuiz = () => {
         setAnimate('');
+        setQuestionTrue(0);
+        setQuestionFalse(0);
         setColorIndex(0);
         setCount1(1);
         setCurrentQuestionIndex(0);
@@ -182,14 +221,29 @@ export default function Objectquiz() {
     const checkAnswer = (selectedAnswer) => {
         if (selectedAnswer === correctAnswer) {
             setMessage("Chính xác!");
-            setPercentQuiz(prevWidth => prevWidth + Chargewidth);
             setShowMessage(true);
             setTimeout(() => {
+                setPercentQuiz(percentQuiz + Chargewidth);
+                setQuestionTrue(questionTrue + 1);
                 handleNextQuestion();
-            }, 1700)
+            }, 1700);
+
+            // Phát âm thanh đúng
+            correctAudioRef.current.src = correctQuiz;
+            correctAudioRef.current.play();
+            correctAudioRef.current.volume = 1;
         } else {
             setMessage("Sai rồi. Hãy thử lại!");
             setShowMessage2(true);
+            setTimeout(() => {
+                setPercentQuiz(percentQuiz + Chargewidth);
+                setQuestionFalse(questionFalse + 1);
+                handleNextQuestion();
+            }, 1700);
+            wrongAudioRef.current.src = wrongQuiz;
+            wrongAudioRef.current.play();
+            wrongAudioRef.current.volume = 1;
+
         }
 
         setTimeout(() => {
@@ -198,6 +252,7 @@ export default function Objectquiz() {
             setMessage("");
         }, 1700);
     };
+
 
     const getRandomColor = () => {
         const index = Math.floor(Math.random() * colors.length);
@@ -217,18 +272,30 @@ export default function Objectquiz() {
         );
     }
 
-    const { question } = shuffledQuizData[`c${currentQuestionIndex + 1}`];
 
+
+    const { question } = shuffledQuizData[`c${currentQuestionIndex + 1}`];
     return (
         <div className={styles.backgroundQuiz}>
             {playAudio()}
             <div style={{ display: 'none' }}>
-                <audio src={linkSrc[0]} ref={audioRef} controls>
+                <audio loop src={linkSrc[currentSrcIndex]} ref={audioRef} controls>
                 </audio>
+            </div>
+
+            <div style={{ display: 'none' }}>
+                <audio ref={correctAudioRef}></audio>
+            </div>
+
+
+            <div style={{ display: 'none' }}>
+                <audio ref={wrongAudioRef}></audio>
             </div>
             <div style={{ width: '100%' }}>
                 <div key={`question-${currentQuestionIndex}`}>
                     <p className={`${styles.quiz} ${animate}`}>{question}</p>
+                    {/* <button onClick={Kq}>Kết quả</button> */}
+                    {/* <p>{questionTrue} - {questionFalse}</p> */}
                 </div>
                 <div className={styles.allQuiz}>
                     {answers.map((answer, index) => (
@@ -250,6 +317,7 @@ export default function Objectquiz() {
                             message={message}
                             type="success"
                         />
+
                     )}
                     {showMessage2 && (
                         <Alert
@@ -261,14 +329,14 @@ export default function Objectquiz() {
                     )}
                 </div>
                 <div className={styles.navigateFooter}>
-                    {console.log(1111,percentQuiz)}
+                    {console.log(1111, percentQuiz, Chargewidth)}
                     <div className={styles.quit}>
                         <button onClick={AgainQuiz}>
                             <UndoOutlined style={{ fontSize: '25px', color: '#333' }} />
                         </button>
                     </div>
-                    <div className={styles.NumberQuestion}  style={{ '--beforeWidth': `${percentQuiz}%` }}>
-                        <div style={{textAlign: 'center', color: 'white', zIndex: '99'}}>{count1}/{count2}</div>
+                    <div className={styles.NumberQuestion} style={{ '--beforeWidth': `${percentQuiz}%` }}>
+                        <div style={{ textAlign: 'center', color: 'white', zIndex: '99' }}>{count1}/{count2}</div>
                     </div>
                     <div className={styles.next}>
                         <button onClick={handleNextQuestion}>

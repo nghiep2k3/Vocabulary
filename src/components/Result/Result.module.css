@@ -1,0 +1,61 @@
+.Container {
+    height: 300px;
+    width: 600px;
+    background-color: white;
+    border-radius: 20px;
+    overflow: hidden;
+    /* Ẩn thanh cuộn khi không cần thiết */
+    padding: 20px;
+    position: relative;
+}
+
+.ResultQuiz {
+    height: 50px;
+    margin: 10px 0;
+    margin-bottom: 40px;
+}
+
+.Text {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 30px;
+}
+
+.btnHome {
+    position: absolute;
+    top: 18px;
+    left: 5px;
+    display: flex;
+    justify-content: center;
+}
+
+.FooterList {
+    max-height: 200px;
+    /* Chiều cao tối đa của FooterList */
+    overflow-y: auto;
+    /* Hiển thị thanh cuộn dọc khi cần thiết */
+    padding: 10px;
+}
+
+.FooterList::-webkit-scrollbar {
+    width: 8px;
+}
+
+@media screen and (max-width: 767px) {
+    .Container {
+        width: 100%;
+        height: 500px;
+    }
+
+    .btnHome {
+        width: 233px;
+        top: auto;
+        left: auto;
+        position: absolute;
+        bottom: 10px;
+        display: flex;
+        justify-content: center;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
