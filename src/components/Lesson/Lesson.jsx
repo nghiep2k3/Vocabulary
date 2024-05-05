@@ -5,13 +5,14 @@ import { Button, Modal, Input, message, Form } from 'antd';
 import { ref, get, child, set, remove } from 'firebase/database';
 import { database } from '../../firebase';
 import Header from '../Header/Header';
-import { CloseOutlined, DatabaseOutlined } from '@ant-design/icons';
-
+import { CloseOutlined, DatabaseOutlined, EditOutlined } from '@ant-design/icons';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function Lesson() {
     const dbRef = ref(database);
     const [form] = Form.useForm();
     const [data, setData] = useState({});
+    const [dataWord, setDataWord] = useState({});
     const [dataModal, setDataModal] = useState([]);
     const [open, setOpen] = useState(false);
     const [openWord, setOpenWord] = useState(false);
@@ -28,7 +29,6 @@ export default function Lesson() {
     const [showConfirmDeleteLesson, setShowConfirmDeleteLesson] = useState(false);
     const [idToDelete, setIdToDelete] = useState(null);
     const [idEdit, setIdEdit] = useState(null);
-
 
     useEffect(() => {
         const fetchVocabularyLengths = async () => {
@@ -120,6 +120,27 @@ export default function Lesson() {
         setShowConfirm(true);
     }
 
+    const handleDelete = async (item) => {
+        console.log(item);
+        console.log(selectedItem);
+        try {
+            const itemPath = `${selectedItem}/Vocabulary/${item}`;
+            console.log(itemPath);
+            await remove(child(dbRef, itemPath));
+
+
+            let snapshot = await get(child(dbRef, `${selectedItem}/Vocabulary`));
+            setDataModal(Object.values(snapshot.val()));
+            
+
+            message.success(`Xóa thành công`);
+        } catch (error) {
+            console.error("Lỗi khi xóa bài học:", error);
+            message.error("Đã xảy ra lỗi khi xóa bài học. Vui lòng thử lại sau.");
+        }
+
+    }
+
     const handleDeleteLesson = (item) => {
         setSelectedItem(item);
         setShowConfirmDeleteLesson(true);
@@ -199,13 +220,16 @@ export default function Lesson() {
             const vocabSnapshot = await get(vocabularyRef);
             const length = vocabSnapshot.exists() ? Object.keys(vocabSnapshot.val()).length : 0;
             console.log(length);
+            const randomUUID = uuidv4();
+            console.log(7846387, randomUUID);
             const newWord = {
                 id: length + 1,
+                ref: randomUUID,
                 question: translate,
                 answer: word,
             };
 
-            const newWordRef = child(vocabularyRef, `c${length + 1}`);
+            const newWordRef = child(vocabularyRef, `${randomUUID}`);
             console.log(newWord);
             await set(newWordRef, newWord);
             form.resetFields();
@@ -261,7 +285,8 @@ export default function Lesson() {
                         <Input
                             style={{ position: 'absolute', right: '0', top: '0', width: "350px" }}
                             placeholder="Nhập từ vựng"
-                            onPressEnter={() => form.submit()}
+
+                        // onPressEnter={() => form.submit()}
                         />
                     </Form.Item>
                     <Form.Item
@@ -305,7 +330,10 @@ export default function Lesson() {
                                 <div key={item.id} style={{ marginBottom: '15px', width: '40%' }}>
                                     {/* <p><strong>Id: {item.id}</strong></p> */}
                                     {/* <p><strong>Id: {item.id}</strong> <button onClick={() => handleDelete(item.id)}>Xóa</button></p> */}
-                                    <p><strong>Id: {item.id}</strong> <button onClick={() => handleEdit(item.id)}>Chỉnh sửa</button></p>
+                                    <p><strong>Id: {item.id}</strong>
+                                        <button onClick={() => handleEdit(item.id)}><EditOutlined /></button>
+                                        <button onClick={() => handleDelete(item.ref)}>Xóa</button>
+                                    </p>
                                     <p><strong>Từ tiếng Anh:</strong> {item.question}</p>
                                     <p><strong>Nghĩa:</strong> {item.answer}</p>
                                 </div>

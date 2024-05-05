@@ -85,6 +85,10 @@ export default function Header() {
         navigate("/Lesson");
     };
 
+    const TestQuiz = () => {
+        navigate("/Testquiz");
+    };
+
     const menu = (
         <Menu>
             <Menu.Item key="1" onClick={showModal}>
@@ -94,7 +98,10 @@ export default function Header() {
                 Danh sách bài học
             </Menu.Item>
             <Menu.Item key="3" onClick={showModalSetting}>
-                Cài đặt
+                Cài đặt 
+            </Menu.Item>
+            <Menu.Item key="4" onClick={TestQuiz}>
+                Môi trường test
             </Menu.Item>
         </Menu>
     );
@@ -106,7 +113,7 @@ export default function Header() {
             <div className={styles.setting}>
                 <div>
                     <Button onClick={togglePlay}>
-                        {isPlaying  ? <span className="material-symbols-outlined">volume_up</span> : <span className="material-symbols-outlined">volume_off</span>}
+                        {isPlaying ? <span className="material-symbols-outlined">volume_up</span> : <span className="material-symbols-outlined">volume_off</span>}
                     </Button>
                 </div>
                 <Dropdown overlay={menu} placement="bottomLeft" trigger={['click']}>

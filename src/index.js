@@ -8,6 +8,7 @@ import Objectquiz from "./components/ObjectQuiz/Objectquiz";
 import Lesson from "./components/Lesson/Lesson";
 import ListWord from "./components/ListWord/ListWord";
 import Result from "./components/Result/Result";
+import Testquiz from "./components/TestQuiz/Testquiz";
 import Dev from "./components/Dev/Dev";
 import { AudioProvider } from "./AudioContext";
 
@@ -21,6 +22,7 @@ const Root = () => {
               {/* <Route index element={<Objectquiz />} /> */}
               <Route path="/Objectquiz/:quiz" element={<Objectquiz />} />
               <Route path="Result" element={<Result />} />
+              <Route path="/Testquiz" element={<Testquiz />} />
             </Route>
             <Route path="/Result" element={<Result />} />
             <Route path="/Lesson" element={<Lesson />} />
