@@ -5,13 +5,14 @@ import { Button, Modal, Input, message, Form } from 'antd';
 import { ref, get, child, set, remove } from 'firebase/database';
 import { database } from '../../firebase';
 import Header from '../Header/Header';
-import { CloseOutlined, DatabaseOutlined } from '@ant-design/icons';
-
+import { CloseOutlined, DatabaseOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function Lesson() {
     const dbRef = ref(database);
     const [form] = Form.useForm();
     const [data, setData] = useState({});
+    const [dataWord, setDataWord] = useState({});
     const [dataModal, setDataModal] = useState([]);
     const [open, setOpen] = useState(false);
     const [openWord, setOpenWord] = useState(false);
@@ -26,9 +27,9 @@ export default function Lesson() {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showConfirmLesson, setShowConfirmLesson] = useState(false);
     const [showConfirmDeleteLesson, setShowConfirmDeleteLesson] = useState(false);
-    const [idToDelete, setIdToDelete] = useState(null);
+    const [showConfirmDeleteWord, setShowConfirmDeleteWord] = useState(false);
     const [idEdit, setIdEdit] = useState(null);
-
+    const [itemWord, setItemWord] = useState(null);
 
     useEffect(() => {
         const fetchVocabularyLengths = async () => {
@@ -100,24 +101,55 @@ export default function Lesson() {
     };
 
 
-    const handleEdit = async (id) => {
-        console.log(id);
-        setIdEdit(id);
+    const handleEdit = async (ref) => {
+        console.log(ref);
+        setIdEdit(ref);
         console.log(selectedItem);
-        const vocabularyRef = child(dbRef, `${selectedItem}/Vocabulary/c${id}`);
+        const vocabularyRef = child(dbRef, `${selectedItem}/Vocabulary/${ref}`);
         try {
             const vocabSnapshot = await get(vocabularyRef);
 
-            if (vocabSnapshot.exists()) {
-                const vocabData = vocabSnapshot.val();
-                console.log(vocabData);
-                setEditWord(vocabSnapshot.val().question);
-                setEditTranslate(vocabSnapshot.val().answer);
-            }
+            const vocabData = vocabSnapshot.val();
+            console.log(vocabData);
+            setEditWord(vocabSnapshot.val().question);
+            setEditTranslate(vocabSnapshot.val().answer);
         } catch (error) {
             console.error(`Lỗi khi lấy danh sách từ vựng cho ${selectedItem}:`, error);
         }
         setShowConfirm(true);
+    }
+
+    const handleDelete = async (item) => {
+        setShowConfirmDeleteWord(true);
+        setItemWord(item);
+
+    }
+
+    const cancelDeleteWord = () => {
+        setShowConfirmDeleteWord(false);
+    };
+
+    const confirmDeleteWord = async () => {
+        console.log(itemWord);
+        console.log(selectedItem);
+        try {
+            const itemPath = `${selectedItem}/Vocabulary/${itemWord}`;
+            console.log(itemPath);
+            await remove(child(dbRef, itemPath));
+
+
+            let snapshot = await get(child(dbRef, `${selectedItem}/Vocabulary`));
+            setDataModal(Object.values(snapshot.val()));
+
+
+            message.success(`Xóa thành công`);
+        } catch (error) {
+            console.error("Lỗi khi xóa bài học:", error);
+            message.error("Đã xảy ra lỗi khi xóa bài học. Vui lòng thử lại sau.");
+        } finally {
+            setItemWord(null);
+            setShowConfirmDeleteWord(false);
+        }
     }
 
     const handleDeleteLesson = (item) => {
@@ -128,7 +160,6 @@ export default function Lesson() {
 
     const cancelDeleteLesson = () => {
         setShowConfirmDeleteLesson(false);
-        setIdToDelete(null);
     };
 
     const ConfirmDeleteLesson = async () => {
@@ -161,7 +192,7 @@ export default function Lesson() {
 
     const confirmEdit = async () => {
         try {
-            const itemPath = `${selectedItem}/Vocabulary/c${idEdit}`;
+            const itemPath = `${selectedItem}/Vocabulary/${idEdit}`;
             console.log(itemPath);
             const newWord = {
                 id: idEdit,
@@ -172,10 +203,10 @@ export default function Lesson() {
             await set(ref(database, itemPath), newWord);
 
         } catch (error) {
-            console.error("Lỗi khi xóa từ vựng:", error);
+            console.error("Lỗi khi sửa từ vựng:", error);
         } finally {
-            setShowConfirm(false);
             setIdEdit(null);
+            setShowConfirm(false);
         }
     };
 
@@ -199,13 +230,16 @@ export default function Lesson() {
             const vocabSnapshot = await get(vocabularyRef);
             const length = vocabSnapshot.exists() ? Object.keys(vocabSnapshot.val()).length : 0;
             console.log(length);
+            const randomUUID = uuidv4();
+            console.log(7846387, randomUUID);
             const newWord = {
                 id: length + 1,
+                ref: randomUUID,
                 question: translate,
                 answer: word,
             };
 
-            const newWordRef = child(vocabularyRef, `c${length + 1}`);
+            const newWordRef = child(vocabularyRef, `${randomUUID}`);
             console.log(newWord);
             await set(newWordRef, newWord);
             form.resetFields();
@@ -231,13 +265,13 @@ export default function Lesson() {
                 {Object.keys(data).map((item, index) => (
                     <div key={item} className={styles.Lesson}>
                         <Link to={`/Objectquiz/${item}`}>
-                            <Button disabled={vocabularyLengths[item] <= 3} style={{ width: '200px' }}>
+                            <Button disabled={vocabularyLengths[item] <= 3} style={{ width: '200px', marginRight: '10px' }}>
                                 {item}
                             </Button>
                         </Link>
-                        <Button onClick={() => showModal(item)}>+</Button>
-                        <Button onClick={() => showModalWord(item)}><DatabaseOutlined /></Button>
-                        <Button onClick={() => handleDeleteLesson(item)}><CloseOutlined /></Button>
+                        <Button style={{ marginRight: '10px' }} onClick={() => showModal(item)}>+</Button>
+                        <Button style={{ marginRight: '10px' }} onClick={() => showModalWord(item)}><DatabaseOutlined /></Button>
+                        <Button style={{ marginRight: '10px' }} onClick={() => handleDeleteLesson(item)}><CloseOutlined /></Button>
                     </div>
                 ))}
 
@@ -261,7 +295,8 @@ export default function Lesson() {
                         <Input
                             style={{ position: 'absolute', right: '0', top: '0', width: "350px" }}
                             placeholder="Nhập từ vựng"
-                            onPressEnter={() => form.submit()}
+
+                        // onPressEnter={() => form.submit()}
                         />
                     </Form.Item>
                     <Form.Item
@@ -301,13 +336,14 @@ export default function Lesson() {
                     <div className={styles.Layout}>
                         {dataModal
                             .filter((item) => item.question.toLowerCase().includes(searchTerm.toLowerCase()))
-                            .map((item) => (
-                                <div key={item.id} style={{ marginBottom: '15px', width: '40%' }}>
-                                    {/* <p><strong>Id: {item.id}</strong></p> */}
-                                    {/* <p><strong>Id: {item.id}</strong> <button onClick={() => handleDelete(item.id)}>Xóa</button></p> */}
-                                    <p><strong>Id: {item.id}</strong> <button onClick={() => handleEdit(item.id)}>Chỉnh sửa</button></p>
-                                    <p><strong>Từ tiếng Anh:</strong> {item.question}</p>
-                                    <p><strong>Nghĩa:</strong> {item.answer}</p>
+                            .map((item, index) => (
+                                <div key={item.id} style={{ marginBottom: '15px', width: '45%', fontSize: '18px', }}>
+                                    <div><strong>Id: {index + 1}</strong>
+                                        <button style={{ margin: '0 10px' }} onClick={() => handleEdit(item.ref)}><EditOutlined style={{ fontSize: '17px' }} /></button>
+                                        <button onClick={() => handleDelete(item.ref)}><DeleteOutlined style={{ fontSize: '17px' }} /></button>
+                                    </div>
+                                    <p><strong>Question:</strong> {item.answer}</p>
+                                    <p><strong>Answer:</strong>  {item.question}</p>
                                 </div>
                             ))}
                     </div>
@@ -332,6 +368,15 @@ export default function Lesson() {
                             value={editTranslate}
                             onChange={(e) => setEditTranslate(e.target.value)}
                         />
+                    </Modal>
+
+                    <Modal
+                        title="Bạn có chắc muốn xóa bài học này không"
+                        open={showConfirmDeleteWord}
+                        onOk={confirmDeleteWord}
+                        onCancel={cancelDeleteWord}
+                    >
+                        <p>Bạn có chắc muốn xóa bài học này không?</p>
                     </Modal>
                 </div>
             </Modal>

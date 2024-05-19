@@ -6,6 +6,8 @@ import { child, get, ref, set } from 'firebase/database';
 import { database } from '../../firebase';
 import link from '../../assets/fakelove.mp3';
 import link2 from '../../assets/Lanterns.mp3';
+import link3 from '../../assets/Monody.mp3';
+
 import { useNavigate } from "react-router-dom";
 import { useAudioContext } from '../../AudioContext';
 
@@ -20,7 +22,8 @@ export default function Header() {
     const [length, setLength] = useState(0);
     const [linkSrc] = useState([
         { id: 1, name: "Fake Love", src: link },
-        { id: 2, name: "Lanterns", src: link2 }
+        { id: 2, name: "Lanterns", src: link2 },
+        { id: 3, name: "Monody", src: link3 }
     ]);
 
     const showModal = () => {
@@ -85,6 +88,10 @@ export default function Header() {
         navigate("/Lesson");
     };
 
+    const TestQuiz = () => {
+        navigate("/Testquiz");
+    };
+
     const menu = (
         <Menu>
             <Menu.Item key="1" onClick={showModal}>
@@ -96,6 +103,9 @@ export default function Header() {
             <Menu.Item key="3" onClick={showModalSetting}>
                 Cài đặt
             </Menu.Item>
+            <Menu.Item key="4" onClick={TestQuiz}>
+                Môi trường test
+            </Menu.Item>
         </Menu>
     );
 
@@ -106,7 +116,7 @@ export default function Header() {
             <div className={styles.setting}>
                 <div>
                     <Button onClick={togglePlay}>
-                        {isPlaying  ? <span className="material-symbols-outlined">volume_up</span> : <span className="material-symbols-outlined">volume_off</span>}
+                        {isPlaying ? <span className="material-symbols-outlined">volume_up</span> : <span className="material-symbols-outlined">volume_off</span>}
                     </Button>
                 </div>
                 <Dropdown overlay={menu} placement="bottomLeft" trigger={['click']}>

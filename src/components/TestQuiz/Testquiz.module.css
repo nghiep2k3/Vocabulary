@@ -1,0 +1,177 @@
+.backgroundQuiz {
+    background-color: rgb(91, 10, 91);
+    height: 600px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    border-radius: 20px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.Go{
+    height: 60px;
+    border: 2px solid gray;
+    width: 120px;
+    cursor: pointer;
+    font-size: 18px;
+    color: white;
+    background-color: #00c985;
+    border-radius: 15px;
+    text-transform: uppercase;
+    font-weight: bold;
+
+}
+
+.quiz {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 50px;
+    font-weight: bold;
+    color: white;
+    height: 200px;
+    width: 100%;
+}
+
+.allQuiz {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 4px;
+    margin-top: 70px;
+}
+
+.alertAnswer{
+    position: absolute;
+    top: 0;
+    width: 300px;
+    right: 0px;
+}
+
+.navigateFooter{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+}
+
+
+.NumberQuestion{
+    height: 40px;
+    border: 2px solid black;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    width: 200px;
+    overflow: hidden;
+    box-sizing: content-box;
+    position: relative;
+    justify-content: center;
+}
+
+.NumberQuestion::before{
+    content: " ";
+    position: absolute;
+    display: flex;
+    background-color:gray;
+    top: 0;
+    height: 40px;
+    left: 0;
+    transition: all 0.5s;
+    width: var(--beforeWidth, 0%);
+}
+/* .next {
+    position: absolute;
+    bottom: 20px;
+    right: 0;
+} */
+
+.next > button{
+    height: 40px;
+    padding: 0 20px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    transition: background-color 0.5s;
+}
+
+.next:hover > button{
+    background-color: red;
+}
+
+/* .quit{
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+} */
+
+.quit > button{
+    height: 40px;
+    padding: 0 20px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    transform: rotate(180deg);
+    transition: background-color 0.5s;
+}
+
+.next:hover > button{
+    background-color: yellow;
+}
+
+.answer {
+    border-radius: 10px;
+    background-color: #33CC33;
+    height: 200px;
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    margin: 0 10px;
+    width: 370px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.answer:hover{
+    opacity: 0.8;
+}
+
+@media screen and (max-width: 767px) {
+    .answer{
+      width: 100%;
+      height: 100px;
+      margin-bottom: 20px;
+    }
+  
+    .allQuiz{
+      flex-direction: column;
+      height: 400px;
+      margin-top: 10px;
+    }
+
+    .next, .quit{
+        bottom: -45px;
+    }
+
+    .navigateFooter{
+        bottom: -47px !important;
+    }
+
+   
+
+    .Lesson{
+        display: flex !important;
+        justify-content: space-between !important;
+    }
+    /* .NumberQuestion{
+        background-color: rgb(25, 214, 25) !important;
+    } */
+  }
