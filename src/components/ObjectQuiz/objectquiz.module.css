@@ -140,6 +140,16 @@
     justify-content: space-around;
 }
 
+.firstLetter {
+    text-transform: capitalize;
+}
+
+
+.answer::first-letter, .quiz::first-letter {
+    text-transform: capitalize;
+}
+
+
 .answer:hover{
     opacity: 0.8;
 }

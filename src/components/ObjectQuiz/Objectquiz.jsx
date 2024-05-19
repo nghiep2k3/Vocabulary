@@ -9,7 +9,7 @@ import correctQuiz from "../../assets/Dung.mp3";
 import wrongQuiz from "../../assets/Sai.mp3";
 import link from '../../assets/fakelove.mp3';
 import link2 from '../../assets/Lanterns.mp3';
-import link3 from '../../assets/Xichlinh.mp3';
+import link3 from '../../assets/Monody.mp3';
 import { child, get, ref, set } from "firebase/database";
 import { useAudioContext } from '../../AudioContext';
 
@@ -293,7 +293,7 @@ export default function Objectquiz() {
             </div>
             <div style={{ width: '100%' }}>
                 <div key={`question-${currentQuestionIndex}`}>
-                    <p className={`${styles.quiz} ${animate}`}>{question}</p>
+                    <p className={`${styles.quiz} ${animate}`}><span className={styles.firstLetter}>{question}</span></p>
                     {/* <button onClick={Kq}>Kết quả</button> */}
                     {/* <p>{questionTrue} - {questionFalse}</p> */}
                 </div>
@@ -305,7 +305,7 @@ export default function Objectquiz() {
                             onClick={() => checkAnswer(answer)}
                             style={{ backgroundColor: colors[(colorIndex + index) % colors.length] }}
                         >
-                            {String.fromCharCode(65 + index)}. {answer}
+                            <span>{String.fromCharCode(65 + index)}. <span className={styles.firstLetter}>{answer}</span></span>
                         </div>
                     ))}
                 </div>

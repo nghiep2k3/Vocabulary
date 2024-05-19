@@ -6,6 +6,8 @@ import { child, get, ref, set } from 'firebase/database';
 import { database } from '../../firebase';
 import link from '../../assets/fakelove.mp3';
 import link2 from '../../assets/Lanterns.mp3';
+import link3 from '../../assets/Monody.mp3';
+
 import { useNavigate } from "react-router-dom";
 import { useAudioContext } from '../../AudioContext';
 
@@ -20,7 +22,8 @@ export default function Header() {
     const [length, setLength] = useState(0);
     const [linkSrc] = useState([
         { id: 1, name: "Fake Love", src: link },
-        { id: 2, name: "Lanterns", src: link2 }
+        { id: 2, name: "Lanterns", src: link2 },
+        { id: 3, name: "Monody", src: link3 }
     ]);
 
     const showModal = () => {
@@ -98,7 +101,7 @@ export default function Header() {
                 Danh sách bài học
             </Menu.Item>
             <Menu.Item key="3" onClick={showModalSetting}>
-                Cài đặt 
+                Cài đặt
             </Menu.Item>
             <Menu.Item key="4" onClick={TestQuiz}>
                 Môi trường test
