@@ -24,6 +24,7 @@ const Root = () => {
               <Route path="Result" element={<Result />} />
               <Route path="/Testquiz" element={<Testquiz />} />
             </Route>
+            
             <Route path="/Result" element={<Result />} />
             <Route path="/Lesson" element={<Lesson />} />
             <Route index element={<Lesson />} />

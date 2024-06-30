@@ -11,6 +11,7 @@ export default function Result() {
     const [questionFalse, setQuestionFalse] = useState(0);
     const [questionUndefine, setQuestionUndefine] = useState(0);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
     useEffect(() => {
         const storedTrue = localStorage.getItem('True');
         const storedFalse = localStorage.getItem('False');
@@ -46,6 +47,8 @@ export default function Result() {
                 <div className={styles.ResultQuiz}>
                     <p className={styles.Text}>Số câu đúng: {questionTrue}</p>
                     <p className={styles.Text}>Số câu sai: {questionFalse}</p>
+
+                    
                     <p className={styles.Text}>Số câu bỏ qua: {questionUndefine}</p>
                 </div>
                 <h2 style={{ textAlign: 'center' }}>Danh sách câu làm sai</h2>
