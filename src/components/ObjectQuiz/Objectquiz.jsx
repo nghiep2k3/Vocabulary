@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from 'react-router-dom';
-import { Alert } from 'antd';
+import { useParams, useNavigate,  } from 'react-router-dom';
+import { Alert, Spin } from 'antd';
 import { CaretRightOutlined, UndoOutlined } from '@ant-design/icons';
 import { database } from "../../firebase";
 import 'animate.css';
@@ -12,7 +12,6 @@ import link2 from '../../assets/Lanterns.mp3';
 import link3 from '../../assets/Monody.mp3';
 import { child, get, ref, set } from "firebase/database";
 import { useAudioContext } from '../../AudioContext';
-
 export default function Objectquiz() {
     const { quiz } = useParams();
     const navigate = useNavigate();
@@ -42,6 +41,7 @@ export default function Objectquiz() {
     const [questionFalse, setQuestionFalse] = useState(0);
     const [questionUndefine, setQuestionUndefine] = useState(0);
     const [currentSrcIndex, setCurrentSrcIndex] = useState(0);
+    const [spinning, setSpinning] = useState(false);
     const audioRef = useRef(null);
     const correctAudioRef = useRef(null);
     const wrongAudioRef = useRef(null);
@@ -119,7 +119,7 @@ export default function Objectquiz() {
     };
 
 
-    const handleNextQuestion = () => {
+    const handleNextQuestion = async () => {
         setAnimate('animate__animated animate__backOutDown');
 
         if (!start) {
@@ -129,7 +129,7 @@ export default function Objectquiz() {
         if (count1 === count2) {
             localStorage.setItem('True', questionTrue);
             localStorage.setItem('False', questionFalse);
-            alert("Đã hết câu hỏi...");
+            // alert("Đã hết câu hỏi...");
             setCount1(1);
             setQuestionTrue(0);
             setQuestionFalse(0);
@@ -150,7 +150,12 @@ export default function Objectquiz() {
             localStorage.setItem('True', questionTrue);
             localStorage.setItem('False', questionFalse);
             localStorage.setItem('questionUndefine', questionUndefine);
-            navigate("/Result");
+            navigate('/Result', {
+                state: { questionTrue, questionFalse }
+            });
+            // await setTimeout(() => {
+            //     navigate("/Result");
+            // }, 2000);
             return;
         }
         setPercentQuiz(prevWidth => prevWidth + Chargewidth);
@@ -161,6 +166,8 @@ export default function Objectquiz() {
             setAnimate('animate__animated animate__bounceInDown');
             setColorIndex(colorIndex + answers.length);
         }, 1000);
+
+        console.log(questionTrue, questionFalse);
     };
 
     useEffect(() => {
@@ -224,7 +231,8 @@ export default function Objectquiz() {
             setShowMessage(true);
             setTimeout(() => {
                 setPercentQuiz(percentQuiz + Chargewidth);
-                setQuestionTrue(questionTrue + 1);
+                setQuestionTrue(prev => prev + 1);
+                console.log(22222,questionTrue);
                 handleNextQuestion();
             }, 1700);
 
@@ -253,6 +261,14 @@ export default function Objectquiz() {
         }, 1700);
     };
 
+    const showLoader = () => {
+        setSpinning(true);
+        setTimeout(() => {
+            navigate("/Result");
+            setSpinning(false);
+        }, 3000);
+    }
+
 
     const getRandomColor = () => {
         const index = Math.floor(Math.random() * colors.length);
@@ -278,6 +294,8 @@ export default function Objectquiz() {
     return (
         <div className={styles.backgroundQuiz}>
             {playAudio()}
+            {console.log(questionTrue)}
+            {/* <button onClick={showLoader}>Show fullscreen for 3s</button> */}
             <div style={{ display: 'none' }}>
                 <audio loop src={linkSrc[currentSrcIndex]} ref={audioRef} controls>
                 </audio>
@@ -345,6 +363,8 @@ export default function Objectquiz() {
                     </div>
                 </div>
             </div>
+
+            {/* <Spin spinning={spinning} fullscreen /> */}
         </div>
     );
 }
