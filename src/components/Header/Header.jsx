@@ -115,7 +115,7 @@ export default function Header() {
             <div className={styles.banner} onClick={HomePage}>Vocabulary</div>
             <div className={styles.setting}>
                 <div>
-                    <Button onClick={togglePlay}>
+                    <Button onClick={togglePlay} style={{maxWidth: '100px'}}>
                         {isPlaying ? <span className="material-symbols-outlined">volume_up</span> : <span className="material-symbols-outlined">volume_off</span>}
                     </Button>
                 </div>

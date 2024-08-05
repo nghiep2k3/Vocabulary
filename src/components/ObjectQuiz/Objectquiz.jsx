@@ -150,9 +150,9 @@ export default function Objectquiz() {
             localStorage.setItem('True', questionTrue);
             localStorage.setItem('False', questionFalse);
             localStorage.setItem('questionUndefine', questionUndefine);
-            navigate('/Result', {
-                state: { questionTrue, questionFalse }
-            });
+            // navigate('/Result', {
+            //     state: { questionTrue, questionFalse }
+            // });
             // await setTimeout(() => {
             //     navigate("/Result");
             // }, 2000);
