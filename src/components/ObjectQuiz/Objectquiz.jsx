@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate,  } from 'react-router-dom';
+import { useParams, useNavigate, } from 'react-router-dom';
 import { Alert, Spin } from 'antd';
 import { CaretRightOutlined, UndoOutlined } from '@ant-design/icons';
 import { database } from "../../firebase";
@@ -45,9 +45,9 @@ export default function Objectquiz() {
     const audioRef = useRef(null);
     const correctAudioRef = useRef(null);
     const wrongAudioRef = useRef(null);
+    const [score, setScore] = useState(0);
 
     const dbRef = ref(database);
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -143,19 +143,13 @@ export default function Objectquiz() {
             shuffledQuestionKeys.forEach((key, index) => {
                 newShuffledQuizData[`c${index + 1}`] = data[key];
             });
-
             setShuffledQuizData(newShuffledQuizData);
             setQuestionAndAnswers(newShuffledQuizData, 0);
             setColorIndex(0);
-            localStorage.setItem('True', questionTrue);
-            localStorage.setItem('False', questionFalse);
-            localStorage.setItem('questionUndefine', questionUndefine);
-            // navigate('/Result', {
-            //     state: { questionTrue, questionFalse }
-            // });
-            // await setTimeout(() => {
-            //     navigate("/Result");
-            // }, 2000);
+            alert(score);
+            // localStorage.setItem('True', questionTrue);
+            // localStorage.setItem('False', questionFalse);
+            // localStorage.setItem('questionUndefine', questionUndefine);
             return;
         }
         setPercentQuiz(prevWidth => prevWidth + Chargewidth);
@@ -229,10 +223,16 @@ export default function Objectquiz() {
         if (selectedAnswer === correctAnswer) {
             setMessage("Chính xác!");
             setShowMessage(true);
+            setScore(prevScore => {
+                const newScore = prevScore + 1;
+                localStorage.setItem("score: ", newScore);
+                console.log("score: ", newScore);
+                return newScore;
+            });
             setTimeout(() => {
                 setPercentQuiz(percentQuiz + Chargewidth);
                 setQuestionTrue(prev => prev + 1);
-                console.log(22222,questionTrue);
+                console.log(22222, questionTrue);
                 handleNextQuestion();
             }, 1700);
 
@@ -251,7 +251,6 @@ export default function Objectquiz() {
             wrongAudioRef.current.src = wrongQuiz;
             wrongAudioRef.current.play();
             wrongAudioRef.current.volume = 1;
-
         }
 
         setTimeout(() => {

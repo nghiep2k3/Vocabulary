@@ -108,7 +108,6 @@ export default function Lesson() {
         const vocabularyRef = child(dbRef, `${selectedItem}/Vocabulary/${ref}`);
         try {
             const vocabSnapshot = await get(vocabularyRef);
-
             const vocabData = vocabSnapshot.val();
             console.log(vocabData);
             setEditWord(vocabSnapshot.val().question);
