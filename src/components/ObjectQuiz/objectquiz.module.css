@@ -169,6 +169,8 @@
       width: 100%;
       height: 100px;
       margin-bottom: 20px;
+      text-align: center;
+      font-size: 19px;
     }
   
     .allQuiz{
@@ -185,6 +187,9 @@
         bottom: -47px !important;
     }
 
+    .quiz{
+        font-size: 45px;
+    }
    
 
     .Lesson{
